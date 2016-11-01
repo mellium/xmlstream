@@ -32,7 +32,7 @@ func (NopResetter) Reset() {
 }
 
 // NopTransformer returns a transformer that does nothing but pass tokens
-// through the pipelien from the input decoder to the output encoder.
+// through the pipeline from the input decoder to the output encoder.
 func NopTransformer() Transformer {
 	return nopTransformer{}
 }
