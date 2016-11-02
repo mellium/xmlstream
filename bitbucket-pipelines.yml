@@ -1,0 +1,14 @@
+image: golang:1.7
+pipelines:
+  default:
+    - step:
+        script:
+          - mkdir -p "$GOPATH/src/mellium.im/"
+          - ln -s "`pwd`" "$GOPATH/src/mellium.im/xmlstream"
+          - cd "$GOPATH/src/mellium.im/xmlstream"
+          - go-wrapper download
+          - go version
+          - make vet
+          - make test
+          - go build
+          - make bench
