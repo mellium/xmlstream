@@ -5,23 +5,54 @@
 // Package xmlstream provides an experimental API for streaming, transforming,
 // and otherwise manipulating XML data.
 //
-// Be advised: This API is still unstable and is subject to change.
+// Be advised: This API is unstable and subject to change.
 package xmlstream // import "mellium.im/xmlstream"
 
 import (
 	"encoding/xml"
-	"io"
 )
+
+// A Tokenizer is anything that can decode a stream of XML tokens.
+type Tokenizer interface {
+	Token() (xml.Token, error)
+	RawToken() (xml.Token, error)
+	Skip() error
+}
+
+// A Encoder is anything that can encode a stream of XML tokens.
+type Encoder interface {
+	EncodeToken(t xml.Token) error
+	Encode(v interface{}) error
+	EncodeElement(v interface{}, start xml.StartElement) error
+	Flush() error
+}
 
 // Transformer transforms tokens on an XML stream.
 type Transformer interface {
-	// Transform reads tokens from src, performs some transformation on them, and
-	// writes the new tokens to dst.
-	Transform(dst *xml.Encoder, src *xml.Decoder) error
+	// Transform decodes tokens from src, performs some transformation on them,
+	// and encodes the new tokens to dst. It should attempt to consume tokens from
+	// src until an error is returned. It may or may not return nil instead of
+	// io.EOF depending on the implementation.
+	Transform(dst Encoder, src Tokenizer) error
 
 	// Reset resets the state and allows a Transformer to be reused.
 	Reset()
 }
+
+// TransformerFunc is an adapter to allow the use of ordinary functions as XML
+// transformers. If f is a function with the appropriate signature,
+// TransformerFunc(f) is a Transformer that calls f.
+type TransformerFunc func(dst Encoder, src Tokenizer) error
+
+// Transform calls f(w, r).
+func (f TransformerFunc) Transform(dst Encoder, src Tokenizer) error {
+	return f(dst, src)
+}
+
+// TODO:
+// Chain returns a Transformer that applies t in sequence.
+// func Chain(t ...Transformer) Transformer {
+// }
 
 // NopResetter can be embedded by implementations of Transformer to add a nop
 // Reset method.
@@ -41,38 +72,10 @@ type nopTransformer struct {
 	NopResetter
 }
 
-func (nopTransformer) Transform(dst *xml.Encoder, src *xml.Decoder) error {
+func (nopTransformer) Transform(dst Encoder, src Tokenizer) error {
 	t, err := src.Token()
 	if err != nil {
 		return err
 	}
 	return dst.EncodeToken(t)
-}
-
-// NewEncoder returns a new xml.Encoder that wraps e by transforming any tokens
-// encoded to it before passing them along to the e.
-func NewEncoder(e *xml.Encoder, t Transformer) *xml.Encoder {
-	r, w := io.Pipe()
-	pipeencoder := xml.NewEncoder(w)
-	d := xml.NewDecoder(r)
-	go func() {
-		if err := t.Transform(e, d); err != nil {
-			return
-		}
-	}()
-	return pipeencoder
-}
-
-// NewDecoder returns a new xml.Decoder that wraps d by transforming any tokens
-// decoded from it before returning them.
-func NewDecoder(d *xml.Decoder, t Transformer) *xml.Decoder {
-	r, w := io.Pipe()
-	pipedecoder := xml.NewDecoder(r)
-	e := xml.NewEncoder(w)
-	go func() {
-		if err := t.Transform(e, d); err != nil {
-			return
-		}
-	}()
-	return pipedecoder
 }
