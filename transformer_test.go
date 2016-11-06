@@ -9,4 +9,3 @@ import (
 )
 
 var _ Tokenizer = (*xml.Decoder)(nil)
-var _ Encoder = (*xml.Encoder)(nil)
