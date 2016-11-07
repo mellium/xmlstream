@@ -13,6 +13,29 @@ import (
 	"mellium.im/xmlstream"
 )
 
+func ExampleIndent() {
+	tokenizer := xmlstream.Indent(xml.NewDecoder(strings.NewReader(`
+<quote>  <p>
+    How now, my hearts! did you never see the picture
+    of 'we three'?</p>
+</quote>`)), xmlstream.Prefix("\n"), xmlstream.Indentation("    "))
+
+	buf := new(bytes.Buffer)
+	e := xml.NewEncoder(buf)
+	for t, err := tokenizer.Token(); err == nil; t, err = tokenizer.Token() {
+		e.EncodeToken(t)
+	}
+	e.Flush()
+	fmt.Println(buf.String())
+	// Output:
+	// <quote>
+	//     <p>
+	//     How now, my hearts! did you never see the picture
+	//     of &#39;we three&#39;?
+	//     </p>
+	// </quote>
+}
+
 func ExampleRemove() {
 	removequote := xmlstream.Remove(func(t xml.Token) bool {
 		switch tok := t.(type) {
