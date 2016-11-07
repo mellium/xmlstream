@@ -74,7 +74,6 @@ func (r remover) Token() (t xml.Token, err error) {
 		}
 		return
 	}
-	return
 }
 
 func (r remover) Skip() error {
