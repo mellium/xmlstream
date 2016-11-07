@@ -80,3 +80,41 @@ func (r remover) Token() (t xml.Token, err error) {
 func (r remover) Skip() error {
 	return r.t.Skip()
 }
+
+// RemoveElement returns a Transformer that removes entire elements (and their
+// children) if f matches the elements start token.
+func RemoveElement(f func(start xml.StartElement) bool) Transformer {
+	return func(src Tokenizer) Tokenizer {
+		return &elementremover{
+			f: f,
+			t: src,
+		}
+	}
+}
+
+type elementremover struct {
+	f func(start xml.StartElement) bool
+	t Tokenizer
+}
+
+func (er *elementremover) Token() (t xml.Token, err error) {
+	for {
+		t, err = er.t.Token()
+		if err != nil {
+			return nil, err
+		}
+		if start, ok := t.(xml.StartElement); ok && er.f(start) {
+			// Skip the element and read a new token.
+			if err = er.Skip(); err != nil {
+				return nil, err
+			}
+			continue
+		}
+
+		return
+	}
+}
+
+func (er *elementremover) Skip() error {
+	return er.t.Skip()
+}
