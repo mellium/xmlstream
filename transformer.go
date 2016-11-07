@@ -10,14 +10,15 @@ import (
 	"encoding/xml"
 )
 
-// A Tokenizer is anything that can decode a stream of XML tokens.
+// A Tokenizer is anything that can decode a stream of XML tokens, including an
+// xml.Decoder.
 type Tokenizer interface {
 	Token() (xml.Token, error)
 	Skip() error
 }
 
-// A Transformer returns a new tokenizer that wraps src and optionally
-// transforms any tokens read from it.
+// A Transformer returns a new tokenizer that returns transformed tokens read
+// from src.
 type Transformer func(src Tokenizer) Tokenizer
 
 // Map returns a Transformer that maps the tokens in the input using the given
