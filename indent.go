@@ -7,8 +7,6 @@ package xmlstream
 import (
 	"bytes"
 	"encoding/xml"
-	"go/doc"
-	"unicode"
 )
 
 // Indent returns a transformer that indents the given XML stream.
@@ -40,23 +38,12 @@ func Indentation(s string) IndentOption {
 	}
 }
 
-// Wrap is the length that chardata should be hard wrapped too.
-func Wrap(len int) IndentOption {
-	return func(f *indenter) {
-		f.wbuf = new(bytes.Buffer)
-		f.wrap = len
-	}
-}
-
 type indenter struct {
-	endnowrap bool
-	nesting   int
-	indent    []byte
-	prefix    []byte
-	queue     []xml.Token
-	t         Tokenizer
-	wbuf      *bytes.Buffer
-	wrap      int
+	nesting int
+	indent  []byte
+	prefix  []byte
+	queue   []xml.Token
+	t       Tokenizer
 }
 
 func (f *indenter) Token() (t xml.Token, err error) {
@@ -72,7 +59,7 @@ func (f *indenter) Token() (t xml.Token, err error) {
 		return
 	}
 
-	switch tok := t.(type) {
+	switch t.(type) {
 	case xml.StartElement:
 		// TODO: Can this all be done more efficiently?
 		toks := []xml.Token{}
@@ -95,10 +82,6 @@ func (f *indenter) Token() (t xml.Token, err error) {
 	case xml.EndElement:
 		// Decrease the indentation level.
 		f.nesting--
-		if f.endnowrap {
-			f.endnowrap = false
-			return tok, nil
-		}
 		toks := []xml.Token{}
 		if len(f.prefix) > 0 {
 			toks = append(toks, xml.CharData(f.prefix))
@@ -112,27 +95,6 @@ func (f *indenter) Token() (t xml.Token, err error) {
 			f.queue = append(f.queue, toks[1:]...)
 		}
 
-		return toks[0], nil
-	case xml.CharData:
-		if f.wrap == 0 || len(tok) < f.wrap {
-			f.endnowrap = true
-			return tok, err
-		}
-		toks := []xml.Token{}
-		if len(f.prefix) > 0 {
-			toks = append(toks, xml.CharData(f.prefix))
-		}
-		if f.wrap > 0 {
-			f.wbuf.Reset()
-			// TODO: We can have zero heap allocations if we write a text.Transformer
-			//       for this.
-			indent := xml.CharData(bytes.Repeat(f.indent, f.nesting))
-			doc.ToText(f.wbuf, string(tok), string(indent), "", f.wrap)
-			toks = append(toks, xml.CharData(bytes.TrimRightFunc(f.wbuf.Bytes(), unicode.IsSpace)))
-		}
-		if len(toks) > 1 {
-			f.queue = append(f.queue, toks[1:]...)
-		}
 		return toks[0], nil
 	}
 
