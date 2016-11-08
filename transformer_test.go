@@ -102,7 +102,7 @@ func TestRemoveAllocs(t *testing.T) {
 			}
 		}
 	}); a > 0 {
-		t.Fatalf("Got %d allocs per run, want 0", a)
+		t.Fatalf("Got %f allocs per run, want 0", a)
 	}
 }
 
@@ -130,7 +130,7 @@ func TestMapAllocs(t *testing.T) {
 			}
 		}
 	}); a > 0 {
-		t.Fatalf("Got %d allocs per run, want 0", a)
+		t.Fatalf("Got %f allocs per run, want 0", a)
 	}
 }
 
