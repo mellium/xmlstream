@@ -87,6 +87,53 @@ func TestRemove(t *testing.T) {
 	})
 }
 
+func TestRemoveAllocs(t *testing.T) {
+	remover := Remove(func(t xml.Token) bool {
+		if _, ok := t.(xml.CharData); ok {
+			return false
+		}
+		return true
+	})
+	d := remover(xml.NewDecoder(strings.NewReader(`<quote>Now Jove,<br/>in his next commodity of hair, send thee a beard!</quote>`)))
+	if a := testing.AllocsPerRun(1000, func() {
+		for tok, err := d.Token(); err != io.EOF; tok, err = d.Token() {
+			if start, ok := tok.(xml.StartElement); ok && start.Name.Local == "br" {
+				err = d.Skip()
+			}
+		}
+	}); a > 0 {
+		t.Fatalf("Got %d allocs per run, want 0", a)
+	}
+}
+
+func TestMapAllocs(t *testing.T) {
+	mapper := Map(func(t xml.Token) xml.Token {
+		switch tok := t.(type) {
+		case xml.StartElement:
+			if tok.Name.Local == "quote" {
+				tok.Name.Local = "blocking"
+				return tok
+			}
+		case xml.EndElement:
+			if tok.Name.Local == "quote" {
+				tok.Name.Local = "blocking"
+				return tok
+			}
+		}
+		return t
+	})
+	d := mapper(xml.NewDecoder(strings.NewReader(`<quote>[Re-enter Clown with<br/>a letter, and FABIAN]</quote>`)))
+	if a := testing.AllocsPerRun(1000, func() {
+		for tok, err := d.Token(); err != io.EOF; tok, err = d.Token() {
+			if start, ok := tok.(xml.StartElement); ok && start.Name.Local == "br" {
+				err = d.Skip()
+			}
+		}
+	}); a > 0 {
+		t.Fatalf("Got %d allocs per run, want 0", a)
+	}
+}
+
 func TestMap(t *testing.T) {
 	runTests(t, []tokenizerTest{
 		{
