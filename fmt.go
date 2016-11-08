@@ -88,6 +88,11 @@ func (f *indenter) Token() (t xml.Token, err error) {
 
 		// Increase the indentation level.
 		f.nesting++
+	default:
+		if len(f.indent) > 0 && f.nesting > 0 {
+			indent := xml.CharData(bytes.Repeat(f.indent, f.nesting))
+			toks = append(toks, indent)
+		}
 	}
 
 	// Add original token

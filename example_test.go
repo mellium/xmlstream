@@ -16,6 +16,7 @@ import (
 func ExampleFmt_indentation() {
 	tokenizer := xmlstream.Fmt(xml.NewDecoder(strings.NewReader(`
 <quote>  <p>
+                 <!-- Chardata is not indented -->
   How now, my hearts! did you never see the picture
 of 'we three'?</p>
 </quote>`)), xmlstream.Prefix("\n"), xmlstream.Indent("    "))
@@ -30,6 +31,7 @@ of 'we three'?</p>
 	// Output:
 	// <quote>
 	//     <p>
+	//         <!-- Chardata is not indented -->
 	//   How now, my hearts! did you never see the picture
 	// of &#39;we three&#39;?
 	//     </p>
