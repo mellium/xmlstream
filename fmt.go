@@ -9,30 +9,30 @@ import (
 	"encoding/xml"
 )
 
-// Indent returns a transformer that indents the given XML stream.
-// The default indentation style is to remove non-significant whitespace, start
-// elements on a new line and indent two spaces per level.
-func Indent(t Tokenizer, opts ...IndentOption) Tokenizer {
+// Fmt returns a transformer that indents the given XML stream.  The default
+// indentation style is to remove non-significant whitespace, start elements on
+// a new line and indent two spaces per level.
+func Fmt(t Tokenizer, opts ...FmtOption) Tokenizer {
 	f := &indenter{t: whitespaceRemover(t)}
 	f.getOpts(opts)
 	return f
 }
 
-// IndentOption is used to configure a formatters behavior.
-type IndentOption func(*indenter)
+// FmtOption is used to configure a formatters behavior.
+type FmtOption func(*indenter)
 
 // Prefix is inserted at the start of every XML element in the stream.
 // The default prefix if this option is not specified is '\n'.
-func Prefix(s string) IndentOption {
+func Prefix(s string) FmtOption {
 	return func(f *indenter) {
 		f.prefix = []byte(s)
 	}
 }
 
-// Indentation is inserted before XML elements zero or more times according to
+// Indent is inserted before XML elements zero or more times according to
 // their nesting depth in the stream.
 // The default indentation is "  " (two ASCII spaces).
-func Indentation(s string) IndentOption {
+func Indent(s string) FmtOption {
 	return func(f *indenter) {
 		f.indent = []byte(s)
 	}
@@ -105,7 +105,7 @@ func (f *indenter) Skip() error {
 	return f.t.Skip()
 }
 
-func (f *indenter) getOpts(opts []IndentOption) {
+func (f *indenter) getOpts(opts []FmtOption) {
 	f.indent = []byte{' ', ' '}
 	f.prefix = []byte{'\n'}
 	for _, opt := range opts {
