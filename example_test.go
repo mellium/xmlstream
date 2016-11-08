@@ -13,11 +13,11 @@ import (
 	"mellium.im/xmlstream"
 )
 
-func ExampleFmt() {
+func ExampleFmt_indentation() {
 	tokenizer := xmlstream.Fmt(xml.NewDecoder(strings.NewReader(`
 <quote>  <p>
-    How now, my hearts! did you never see the picture
-    of 'we three'?</p>
+  How now, my hearts! did you never see the picture
+of 'we three'?</p>
 </quote>`)), xmlstream.Prefix("\n"), xmlstream.Indent("    "))
 
 	buf := new(bytes.Buffer)
@@ -30,8 +30,8 @@ func ExampleFmt() {
 	// Output:
 	// <quote>
 	//     <p>
-	//     How now, my hearts! did you never see the picture
-	//     of &#39;we three&#39;?
+	//   How now, my hearts! did you never see the picture
+	// of &#39;we three&#39;?
 	//     </p>
 	// </quote>
 }

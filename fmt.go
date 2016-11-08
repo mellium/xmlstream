@@ -59,46 +59,47 @@ func (f *indenter) Token() (t xml.Token, err error) {
 		return
 	}
 
+	if _, ok := t.(xml.CharData); ok {
+		return t, nil
+	}
+
+	toks := []xml.Token{}
+
+	// Add prefix
+	if len(f.prefix) > 0 {
+		toks = append(toks, xml.CharData(f.prefix))
+	}
+
+	// Add indentation
 	switch t.(type) {
-	case xml.StartElement:
-		// TODO: Can this all be done more efficiently?
-		toks := []xml.Token{}
-		if len(f.prefix) > 0 {
-			toks = append(toks, xml.CharData(f.prefix))
-		}
+	case xml.EndElement:
+		// Decrease the indentation level.
+		f.nesting--
+
 		if len(f.indent) > 0 && f.nesting > 0 {
 			indent := xml.CharData(bytes.Repeat(f.indent, f.nesting))
 			toks = append(toks, indent)
 		}
-		toks = append(toks, t)
-		if len(toks) > 1 {
-			f.queue = append(f.queue, toks[1:]...)
+	case xml.StartElement:
+		if len(f.indent) > 0 && f.nesting > 0 {
+			indent := xml.CharData(bytes.Repeat(f.indent, f.nesting))
+			toks = append(toks, indent)
 		}
 
 		// Increase the indentation level.
 		f.nesting++
-
-		return toks[0], nil
-	case xml.EndElement:
-		// Decrease the indentation level.
-		f.nesting--
-		toks := []xml.Token{}
-		if len(f.prefix) > 0 {
-			toks = append(toks, xml.CharData(f.prefix))
-		}
-		if len(f.indent) > 0 && f.nesting > 0 {
-			indent := xml.CharData(bytes.Repeat(f.indent, f.nesting))
-			toks = append(toks, indent)
-		}
-		toks = append(toks, t)
-		if len(toks) > 1 {
-			f.queue = append(f.queue, toks[1:]...)
-		}
-
-		return toks[0], nil
 	}
 
-	return
+	// Add original token
+	toks = append(toks, t)
+
+	// Queue up all tokens but the first one
+	if len(toks) > 1 {
+		f.queue = append(f.queue, toks[1:]...)
+	}
+
+	// Return the token that would be the next one on the queue
+	return toks[0], nil
 }
 
 func (f *indenter) Skip() error {
