@@ -13,18 +13,18 @@ import (
 // indentation style is to remove non-significant whitespace, start elements on
 // a new line and indent two spaces per level.
 func Fmt(t Tokenizer, opts ...FmtOption) Tokenizer {
-	f := &indenter{t: whitespaceRemover(t)}
+	f := &fmter{t: whitespaceRemover(t)}
 	f.getOpts(opts)
 	return f
 }
 
 // FmtOption is used to configure a formatters behavior.
-type FmtOption func(*indenter)
+type FmtOption func(*fmter)
 
 // Prefix is inserted at the start of every XML element in the stream.
 // The default prefix if this option is not specified is '\n'.
 func Prefix(s string) FmtOption {
-	return func(f *indenter) {
+	return func(f *fmter) {
 		f.prefix = []byte(s)
 	}
 }
@@ -33,12 +33,12 @@ func Prefix(s string) FmtOption {
 // their nesting depth in the stream.
 // The default indentation is "  " (two ASCII spaces).
 func Indent(s string) FmtOption {
-	return func(f *indenter) {
+	return func(f *fmter) {
 		f.indent = []byte(s)
 	}
 }
 
-type indenter struct {
+type fmter struct {
 	nesting int
 	indent  []byte
 	prefix  []byte
@@ -46,7 +46,7 @@ type indenter struct {
 	t       Tokenizer
 }
 
-func (f *indenter) Token() (t xml.Token, err error) {
+func (f *fmter) Token() (t xml.Token, err error) {
 	// If we've queued up a token to write next, go ahead and pop the next token
 	// off the queue.
 	if len(f.queue) > 0 {
@@ -107,11 +107,11 @@ func (f *indenter) Token() (t xml.Token, err error) {
 	return toks[0], nil
 }
 
-func (f *indenter) Skip() error {
+func (f *fmter) Skip() error {
 	return f.t.Skip()
 }
 
-func (f *indenter) getOpts(opts []FmtOption) {
+func (f *fmter) getOpts(opts []FmtOption) {
 	f.indent = []byte{' ', ' '}
 	f.prefix = []byte{'\n'}
 	for _, opt := range opts {
