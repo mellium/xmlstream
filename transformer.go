@@ -21,6 +21,31 @@ type Tokenizer interface {
 // from src.
 type Transformer func(src Tokenizer) Tokenizer
 
+// Inspect performs an operation for each token in the stream without
+// transforming the stream in any way.
+func Inspect(f func(t xml.Token)) Transformer {
+	return func(src Tokenizer) Tokenizer {
+		return inspector{
+			Tokenizer: src,
+			f:         f,
+		}
+	}
+}
+
+type inspector struct {
+	Tokenizer
+	f func(t xml.Token)
+}
+
+func (t inspector) Token() (xml.Token, error) {
+	tok, err := t.Tokenizer.Token()
+	if err != nil {
+		return nil, err
+	}
+	t.f(tok)
+	return tok, nil
+}
+
 // Map returns a Transformer that maps the tokens in the input using the given
 // mapping.
 func Map(mapping func(t xml.Token) xml.Token) Transformer {

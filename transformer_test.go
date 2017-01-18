@@ -54,6 +54,26 @@ func runTests(t *testing.T, tcs []tokenizerTest) {
 	}
 }
 
+func TestInspect(t *testing.T) {
+	tokens := 0
+	inspector := Inspect(func(t xml.Token) {
+		tokens++
+	})
+	d := inspector(xml.NewDecoder(strings.NewReader(`<quote>Now Jove,<br/>in his next commodity of hair, send thee a beard!</quote>`)))
+	if a := testing.AllocsPerRun(1000, func() {
+		for tok, err := d.Token(); err != io.EOF; tok, err = d.Token() {
+			if start, ok := tok.(xml.StartElement); ok && start.Name.Local == "br" {
+				err = d.Skip()
+			}
+		}
+	}); a > 0 {
+		t.Fatalf("Got %f allocs per run, want 0", a)
+	}
+	if tokens != 5 {
+		t.Fatalf("Got %d tokens but expected 5", tokens)
+	}
+}
+
 func TestRemove(t *testing.T) {
 	runTests(t, []tokenizerTest{
 		{
