@@ -15,6 +15,9 @@ import (
 
 var _ Tokenizer = (*xml.Decoder)(nil)
 
+// Number of times to loop allocation tests
+const numruns = 1000
+
 type tokenizerTest struct {
 	Transform Transformer
 	Input     string
@@ -49,24 +52,6 @@ func runTests(t *testing.T, tcs []tokenizerTest) {
 			case buf.String() != tc.Output:
 				t.Fatalf("got=`%s`, want=`%s`", buf.String(), tc.Output)
 			}
-			r := strings.NewReader(tc.Input)
-			// TODO: This will only work for stateless transformers.
-			trans := tc.Transform(d)
-			allocs := testing.AllocsPerRun(1000, func() {
-				err = nil
-				d = xml.NewDecoder(r)
-				for err == nil {
-					tok, err = trans.Token()
-				}
-				r.Reset(tc.Input)
-			})
-			// This is not zero because we do have to create a new Transformer and
-			// Decoder each time we loop. Maybe there's a better way to write this
-			// test? This also doesn't really work; some things might have more allocs
-			// in their setup.
-			if allocs > 2 {
-				t.Fatalf("Got %f allocs per run, want 3 (0 in fast path)", allocs)
-			}
 		})
 	}
 }
@@ -77,14 +62,10 @@ func TestInspect(t *testing.T) {
 		tokens++
 	})
 	d := inspector(xml.NewDecoder(strings.NewReader(`<quote>Now Jove,<br/>in his next commodity of hair, send thee a beard!</quote>`)))
-	if a := testing.AllocsPerRun(1000, func() {
-		for tok, err := d.Token(); err != io.EOF; tok, err = d.Token() {
-			if start, ok := tok.(xml.StartElement); ok && start.Name.Local == "br" {
-				err = d.Skip()
-			}
+	for tok, err := d.Token(); err != io.EOF; tok, err = d.Token() {
+		if start, ok := tok.(xml.StartElement); ok && start.Name.Local == "br" {
+			err = d.Skip()
 		}
-	}); a > 0 {
-		t.Fatalf("Got %f allocs per run, want 0", a)
 	}
 	if tokens != 5 {
 		t.Fatalf("Got %d tokens but expected 5", tokens)
