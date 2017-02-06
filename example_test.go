@@ -8,10 +8,25 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 
 	"mellium.im/xmlstream"
 )
+
+func ExampleInnerReader() {
+	r := xmlstream.InnerReader(strings.NewReader(`<stream:features>
+<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'>
+<required/>
+</starttls>
+</stream:features>`))
+	io.Copy(os.Stdout, r)
+	// Output:
+	// <starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'>
+	// <required/>
+	// </starttls>
+}
 
 func ExampleFmt_indentation() {
 	tokenizer := xmlstream.Fmt(xml.NewDecoder(strings.NewReader(`
