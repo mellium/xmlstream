@@ -27,6 +27,61 @@ var innerReaderTests = [...]struct {
 		Read: ``,
 		Err:  nil,
 	},
+	1: {
+		R:    strings.NewReader(`<test></test>`),
+		Read: ``,
+		Err:  nil,
+	},
+	2: {
+		R:    strings.NewReader(`<test><inner/></test>`),
+		Read: `<inner/>`,
+		Err:  nil,
+	},
+	3: {
+		R:    strings.NewReader(`<test>Inner</test>`),
+		Read: `Inner`,
+		Err:  nil,
+	},
+	4: {
+		R:    strings.NewReader(`<test>Inner</oops>`),
+		Read: `Inner`,
+		Err:  unexpectedEndError{"oops"},
+	},
+	5: {
+		R:    strings.NewReader(`<stream xmlns="stream">Test</stream>`),
+		Read: `Test`,
+		Err:  nil,
+	},
+	6: {
+		R:    strings.NewReader(`<stream:stream><stream:features></stream:stream>`),
+		Read: `<stream:features>`,
+		Err:  nil,
+	},
+	7: {
+		R:    strings.NewReader(`<stream:stream><stream:features> <stream:stream>`),
+		Read: `<stream:features>`,
+		Err:  notEndError,
+	},
+	8: {
+		R:    strings.NewReader(`<stream:stream><stream:features><stream:stream>`),
+		Read: `<stream:features`,
+		Err:  notEndError,
+	},
+	9: {
+		R:    strings.NewReader(`</stream:stream>`),
+		Read: ``,
+		Err:  notStartError,
+	},
+	10: {
+		R:    strings.NewReader(`<!-- Test -->`),
+		Read: ``,
+		Err:  notStartError,
+	},
+	11: {
+		R:    strings.NewReader(`What is dis junk?`),
+		Read: ``,
+		Err:  notStartError,
+	},
 }
 
 func TestInnerReader(t *testing.T) {
@@ -37,10 +92,10 @@ func TestInnerReader(t *testing.T) {
 				t.Fatal("InnerReader returned nil reader")
 			}
 			b, err := ioutil.ReadAll(ir)
-			switch {
-			case err != tc.Err:
+			if err != tc.Err {
 				t.Errorf("Unxpected error: want=`%v`, got=`%v`", tc.Err, err)
-			case string(b) != tc.Read:
+			}
+			if string(b) != tc.Read {
 				t.Errorf("Unexpected value read: want=`%s`, got=`%s`", tc.Read, b)
 			}
 		})
