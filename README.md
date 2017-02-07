@@ -6,7 +6,7 @@
 An experimental API for manipulating streams of XML data.
 
 ```go
-import mellium.im/xmlstream
+import "mellium.im/xmlstream"
 ```
 
 ## License
