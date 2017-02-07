@@ -5,6 +5,7 @@
 package xmlstream
 
 import (
+	"encoding/xml"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -40,7 +41,7 @@ var innerReaderTests = [...]struct {
 	4: {
 		R:    strings.NewReader(`<test>Inner</oops>`),
 		Read: `Inner`,
-		Err:  unexpectedEndError{"oops"},
+		Err:  unexpectedEndError{xml.Name{Local: "oops"}},
 	},
 	5: {
 		R:    strings.NewReader(`<stream xmlns="stream">Test</stream>`),
@@ -86,6 +87,21 @@ var innerReaderTests = [...]struct {
 		R:    strings.NewReader(`<test:test/>`),
 		Read: ``,
 		Err:  nil,
+	},
+	14: {
+		R:    strings.NewReader(`<stream:stream></stream:oops>`),
+		Read: ``,
+		Err:  unexpectedEndError{xml.Name{Local: "oops", Space: "stream"}},
+	},
+	15: {
+		R:    strings.NewReader(`<stream:stream></oops:stream>`),
+		Read: ``,
+		Err:  unexpectedEndError{xml.Name{Local: "stream", Space: "oops"}},
+	},
+	16: {
+		R:    strings.NewReader(`<stream:stream>Inner</stream:oops>`),
+		Read: `Inn`,
+		Err:  errNotEnd,
 	},
 }
 

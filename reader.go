@@ -20,11 +20,14 @@ var (
 )
 
 type unexpectedEndError struct {
-	localName string
+	name xml.Name
 }
 
 func (u unexpectedEndError) Error() string {
-	return fmt.Sprintf("Unexpected end element </%s>", u.localName)
+	if u.name.Space == "" {
+		return fmt.Sprintf("Unexpected end element </%s>", u.name.Local)
+	}
+	return fmt.Sprintf("Unexpected end element </%s:%s>", u.name.Local, u.name.Space)
 }
 
 // TODO: We almost certainly need to expose the start token somehow, but I can't
@@ -59,7 +62,7 @@ func InnerReader(r io.Reader) io.Reader {
 		case !ok:
 			return errNotEnd
 		case rawend != end:
-			return unexpectedEndError{rawend.Name.Local}
+			return unexpectedEndError{rawend.Name}
 		}
 		return nil
 	})
