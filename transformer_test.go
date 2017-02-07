@@ -15,9 +15,6 @@ import (
 
 var _ Tokenizer = (*xml.Decoder)(nil)
 
-// Number of times to loop allocation tests
-const numruns = 1000
-
 type tokenizerTest struct {
 	Transform Transformer
 	Input     string
@@ -64,7 +61,9 @@ func TestInspect(t *testing.T) {
 	d := inspector(xml.NewDecoder(strings.NewReader(`<quote>Now Jove,<br/>in his next commodity of hair, send thee a beard!</quote>`)))
 	for tok, err := d.Token(); err != io.EOF; tok, err = d.Token() {
 		if start, ok := tok.(xml.StartElement); ok && start.Name.Local == "br" {
-			err = d.Skip()
+			if err = d.Skip(); err == io.EOF {
+				break
+			}
 		}
 	}
 	if tokens != 5 {
