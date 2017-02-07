@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	notEndError   = errors.New("Expected end element, found something else")
-	notStartError = errors.New("Expected start element, found something else")
+	errNotEnd   = errors.New("Expected end element, found something else")
+	errNotStart = errors.New("Expected start element, found something else")
 )
 
 type unexpectedEndError struct {
@@ -57,7 +57,7 @@ func InnerReader(r io.Reader) io.Reader {
 		rawend, ok := tok.(xml.EndElement)
 		switch {
 		case !ok:
-			return notEndError
+			return errNotEnd
 		case rawend != end:
 			return unexpectedEndError{rawend.Name.Local}
 		}
@@ -73,7 +73,7 @@ func InnerReader(r io.Reader) io.Reader {
 		}
 		rawstart, ok := tok.(xml.StartElement)
 		if !ok {
-			return notStartError
+			return errNotStart
 		}
 		// Don't use rawstart.End() because that apparently handles namespace
 		// prefixes even though it's a raw token.

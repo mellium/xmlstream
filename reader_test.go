@@ -55,27 +55,27 @@ var innerReaderTests = [...]struct {
 	7: {
 		R:    strings.NewReader(`<stream:stream><stream:features> <stream:stream>`),
 		Read: `<stream:features>`,
-		Err:  notEndError,
+		Err:  errNotEnd,
 	},
 	8: {
 		R:    strings.NewReader(`<stream:stream><stream:features><stream:stream>`),
 		Read: `<stream:features`,
-		Err:  notEndError,
+		Err:  errNotEnd,
 	},
 	9: {
 		R:    strings.NewReader(`</stream:stream>`),
 		Read: ``,
-		Err:  notStartError,
+		Err:  errNotStart,
 	},
 	10: {
 		R:    strings.NewReader(`<!-- Test -->`),
 		Read: ``,
-		Err:  notStartError,
+		Err:  errNotStart,
 	},
 	11: {
 		R:    strings.NewReader(`What is dis junk?`),
 		Read: ``,
-		Err:  notStartError,
+		Err:  errNotStart,
 	},
 	12: {
 		R:    strings.NewReader(`<test/>`),
