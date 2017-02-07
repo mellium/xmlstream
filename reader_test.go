@@ -103,6 +103,16 @@ var innerReaderTests = [...]struct {
 		Read: `Inn`,
 		Err:  errNotEnd,
 	},
+	17: {
+		R:    strings.NewReader(`<stream:stream></stream:oooooooooooo>`),
+		Read: `</stre`,
+		Err:  errNotEnd,
+	},
+	18: {
+		R:    strings.NewReader(`<stream:stream></oooooooooooo:stream>`),
+		Read: `</oooo`,
+		Err:  errNotEnd,
+	},
 }
 
 func TestInnerReader(t *testing.T) {
