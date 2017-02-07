@@ -78,7 +78,8 @@ func InnerReader(r io.Reader) io.Reader {
 		// Don't use rawstart.End() because that apparently handles namespace
 		// prefixes even though it's a raw token.
 		end = xml.EndElement{Name: rawstart.Name}
-		lr.N = int64(br.Buffered() - len(rawstart.Name.Local) - len(rawstart.Name.Space) - 3) // 3 == len('</>')
+		// 3 == len('</>')
+		lr.N = int64(br.Buffered() - len(rawstart.Name.Local) - len(rawstart.Name.Space) - 3)
 		// If there is a namespace on the rawtoken, subtract one more for the ":"
 		// separator (it's a prefix).
 		if rawstart.Name.Space != "" {
@@ -89,26 +90,4 @@ func InnerReader(r io.Reader) io.Reader {
 	})
 
 	return before
-}
-
-// numReadReader keeps track of the number of bytes that have been read during
-// the lifetime of the reader.
-type numReadReader struct {
-	R interface {
-		io.ByteReader
-		io.Reader
-	}
-	TotalRead int
-}
-
-func (nrr *numReadReader) Read(p []byte) (n int, err error) {
-	n, err = nrr.R.Read(p)
-	nrr.TotalRead += n
-	return
-}
-
-func (nrr *numReadReader) ReadByte() (byte, error) {
-	b, err := nrr.R.ReadByte()
-	nrr.TotalRead++
-	return b, err
 }
