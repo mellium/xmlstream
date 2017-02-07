@@ -82,6 +82,16 @@ var innerReaderTests = [...]struct {
 		Read: ``,
 		Err:  notStartError,
 	},
+	12: {
+		R:    strings.NewReader(`<test/>`),
+		Read: ``,
+		Err:  nil,
+	},
+	13: {
+		R:    strings.NewReader(`<test:test/>`),
+		Read: ``,
+		Err:  nil,
+	},
 }
 
 func TestInnerReader(t *testing.T) {
