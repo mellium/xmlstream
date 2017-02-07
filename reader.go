@@ -30,9 +30,12 @@ func (u unexpectedEndError) Error() string {
 // TODO: We almost certainly need to expose the start token somehow, but I can't
 //       think of a clean API to do it.
 
-// InnerReader is a reader which attempts to decode an xml.StartElement token
-// on the first call to Read (returning an error if an invalid start token is
-// found).
+// InnerReader is an io.Reader which attempts to decode an xml.StartElement from
+// the stream on the first call to Read (returning an error if an invalid start
+// token is found) and returns a new reader which only reads the inner XML
+// without parsing it or checking its validity.
+// After the inner XML is read, the end token is parsed and if it does not exist
+// or does not match the original start token an error is returned.
 func InnerReader(r io.Reader) io.Reader {
 	var end xml.EndElement
 
@@ -61,7 +64,8 @@ func InnerReader(r io.Reader) io.Reader {
 		return nil
 	})
 
-	// Before we read the body, pop the start token.
+	// Before we read the body, pop the start token and set the length on the
+	// limit reader to the length of the inner XML.
 	before := reader.Before(after, func() error {
 		tok, err := d.RawToken()
 		if err != nil {
