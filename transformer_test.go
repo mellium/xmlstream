@@ -132,7 +132,7 @@ func TestMap(t *testing.T) {
 func TestRemoveAttr(t *testing.T) {
 	runTests(t, []tokenizerTest{
 		{
-			Transform: RemoveAttr(func(a xml.Attr) bool {
+			Transform: RemoveAttr(func(_ xml.StartElement, _ xml.Attr) bool {
 				return false
 			}),
 			Input:  `<quote act="1" scene="5" character="Feste">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
@@ -140,7 +140,7 @@ func TestRemoveAttr(t *testing.T) {
 			Err:    false,
 		},
 		{
-			Transform: RemoveAttr(func(a xml.Attr) bool {
+			Transform: RemoveAttr(func(_ xml.StartElement, _ xml.Attr) bool {
 				return true
 			}),
 			Input:  `<!-- Quote --><quote act="1" scene="5" cite="Feste">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
@@ -148,11 +148,19 @@ func TestRemoveAttr(t *testing.T) {
 			Err:    false,
 		},
 		{
-			Transform: RemoveAttr(func(a xml.Attr) bool {
+			Transform: RemoveAttr(func(_ xml.StartElement, a xml.Attr) bool {
 				return a.Name.Local == "cite"
 			}),
 			Input:  `<quote act="1" cite="Feste" scene="5">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
 			Output: `<quote act="1" scene="5">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
+			Err:    false,
+		},
+		{
+			Transform: RemoveAttr(func(start xml.StartElement, a xml.Attr) bool {
+				return start.Name.Local == "quote" && a.Name.Local == "cite"
+			}),
+			Input:  `<text cite="Feste"></text><quote act="1" cite="Feste" scene="5">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
+			Output: `<text cite="Feste"></text><quote act="1" scene="5">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
 			Err:    false,
 		},
 	})

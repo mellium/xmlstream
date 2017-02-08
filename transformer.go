@@ -147,7 +147,7 @@ func (er *elementremover) Skip() error {
 
 // RemoveAttr returns a Transformer that removes attributes from
 // xml.StartElement's if f matches.
-func RemoveAttr(f func(attr xml.Attr) bool) Transformer {
+func RemoveAttr(f func(start xml.StartElement, attr xml.Attr) bool) Transformer {
 	return func(src Tokenizer) Tokenizer {
 		return &attrRemover{
 			f: f,
@@ -157,7 +157,7 @@ func RemoveAttr(f func(attr xml.Attr) bool) Transformer {
 }
 
 type attrRemover struct {
-	f func(xml.Attr) bool
+	f func(xml.StartElement, xml.Attr) bool
 	t Tokenizer
 }
 
@@ -174,7 +174,7 @@ func (ar *attrRemover) Token() (xml.Token, error) {
 
 	b := start.Attr[:0]
 	for _, attr := range start.Attr {
-		if !ar.f(attr) {
+		if !ar.f(start, attr) {
 			b = append(b, attr)
 		}
 	}
