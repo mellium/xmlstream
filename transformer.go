@@ -142,6 +142,9 @@ func (er *elementremover) Skip() error {
 	return er.t.Skip()
 }
 
+// BUG(ssw): Multiple uses of RemoveAttr will iterate over the attr list
+//           multiple times.
+
 // RemoveAttr returns a Transformer that removes attributes from
 // xml.StartElement's if f matches.
 func RemoveAttr(f func(attr xml.Attr) bool) Transformer {
