@@ -15,7 +15,7 @@ type Tokenizer interface {
 	Skip() error
 }
 
-// A Transformer returns a new tokenizer that returns transformed tokens read
+// A Transformer returns a new Tokenizer that returns transformed tokens read
 // from src.
 type Transformer func(src Tokenizer) Tokenizer
 
