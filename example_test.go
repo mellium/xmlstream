@@ -15,6 +15,26 @@ import (
 	"mellium.im/xmlstream"
 )
 
+func ExampleEncode() {
+	removequote := xmlstream.Remove(func(t xml.Token) bool {
+		switch tok := t.(type) {
+		case xml.StartElement:
+			return tok.Name.Local == "quote"
+		case xml.EndElement:
+			return tok.Name.Local == "quote"
+		}
+		return false
+	})
+
+	e := xml.NewEncoder(os.Stdout)
+	xmlstream.Encode(e, removequote(xml.NewDecoder(strings.NewReader(`
+<quote>
+  <p>Foolery, sir, does walk about the orb, like the sun; it shines everywhere.</p>
+</quote>`))))
+	// Output:
+	// <p>Foolery, sir, does walk about the orb, like the sun; it shines everywhere.</p>
+}
+
 func ExampleInnerReader() {
 	r := xmlstream.InnerReader(strings.NewReader(`<stream:features>
 <starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'>
@@ -57,13 +77,9 @@ func ExampleRemove() {
 	removequote := xmlstream.Remove(func(t xml.Token) bool {
 		switch tok := t.(type) {
 		case xml.StartElement:
-			if tok.Name.Local == "quote" {
-				return true
-			}
+			return tok.Name.Local == "quote"
 		case xml.EndElement:
-			if tok.Name.Local == "quote" {
-				return true
-			}
+			return tok.Name.Local == "quote"
 		}
 		return false
 	})

@@ -6,6 +6,7 @@ package xmlstream
 
 import (
 	"encoding/xml"
+	"io"
 )
 
 // A Tokenizer is anything that can decode a stream of XML tokens, including an
@@ -18,6 +19,36 @@ type Tokenizer interface {
 // A Transformer returns a new Tokenizer that returns transformed tokens read
 // from src.
 type Transformer func(src Tokenizer) Tokenizer
+
+// Encode consumes a tokenizer and encodes any tokens that it outputs.
+// If an error is returned on the Decode or Encode side, it is returned
+// immediately.
+// Since Encode is defined as consuming the stream until the end, io.EOF is not
+// returned.
+// If no error would be returned, Encode flushes the underlying encoder when it
+// is done.
+func Encode(e *xml.Encoder, t Tokenizer) (err error) {
+	defer func() {
+		if err == nil || err == io.EOF {
+			err = e.Flush()
+		}
+	}()
+
+	var tok xml.Token
+	tok, err = t.Token()
+	for {
+		if err != nil {
+			return err
+		}
+
+		if err = e.EncodeToken(tok); err != nil {
+			return err
+		}
+
+		tok, err = t.Token()
+	}
+	panic("xmlstream: unreachable code reached; you done broke it.")
+}
 
 // Inspect performs an operation for each token in the stream without
 // transforming the stream in any way.
