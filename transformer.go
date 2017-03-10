@@ -47,7 +47,6 @@ func Encode(e *xml.Encoder, t Tokenizer) (err error) {
 
 		tok, err = t.Token()
 	}
-	panic("xmlstream: unreachable code reached; you done broke it.")
 }
 
 // Inspect performs an operation for each token in the stream without
