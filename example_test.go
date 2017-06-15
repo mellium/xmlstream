@@ -101,7 +101,7 @@ func ExampleRemove() {
 }
 
 func ExampleRemoveElement() {
-	removeen := xmlstream.RemoveElement(func(start xml.StartElement) bool {
+	removeLangEn := xmlstream.RemoveElement(func(start xml.StartElement) bool {
 		// TODO: Probably be more specific and actually check the name.
 		if len(start.Attr) > 0 && start.Attr[0].Value == "en" {
 			return true
@@ -109,7 +109,7 @@ func ExampleRemoveElement() {
 		return false
 	})
 
-	tokenizer := removeen(xml.NewDecoder(strings.NewReader(`
+	d := removeLangEn(xml.NewDecoder(strings.NewReader(`
 <quote>
 <p xml:lang="en">Thus the whirligig of time brings in his revenges.</p>
 <p xml:lang="fr">et c’est ainsi que la roue du temps amène les occasions de revanche.</p>
@@ -118,7 +118,7 @@ func ExampleRemoveElement() {
 
 	buf := new(bytes.Buffer)
 	e := xml.NewEncoder(buf)
-	for t, err := tokenizer.Token(); err == nil; t, err = tokenizer.Token() {
+	for t, err := d.Token(); err == nil; t, err = d.Token() {
 		e.EncodeToken(t)
 	}
 	e.Flush()

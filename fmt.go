@@ -9,13 +9,13 @@ import (
 	"encoding/xml"
 )
 
-// Fmt returns a transformer that indents the given XML stream.  The default
-// indentation style is to remove non-significant whitespace, start elements on
-// a new line and indent two spaces per level.
-func Fmt(t TokenReader, opts ...FmtOption) TokenReader {
-	f := &fmter{t: whitespaceRemover(t)}
+// Fmt returns a transformer that indents the given XML stream.
+// The default indentation style is to remove non-significant whitespace, start
+// elements on a new line and indent two spaces per level.
+func Fmt(d *xml.Decoder, opts ...FmtOption) *xml.Decoder {
+	f := &fmter{d: xml.NewTokenDecoder(whitespaceRemover(d))}
 	f.getOpts(opts)
-	return f
+	return xml.NewTokenDecoder(f)
 }
 
 // FmtOption is used to configure a formatters behavior.
@@ -39,11 +39,11 @@ func Indent(s string) FmtOption {
 }
 
 type fmter struct {
+	d       *xml.Decoder
 	nesting int
 	indent  []byte
 	prefix  []byte
 	queue   []xml.Token
-	t       TokenReader
 }
 
 func (f *fmter) Token() (t xml.Token, err error) {
@@ -54,7 +54,7 @@ func (f *fmter) Token() (t xml.Token, err error) {
 		return
 	}
 
-	t, err = f.t.Token()
+	t, err = f.d.Token()
 	if err != nil {
 		return
 	}
@@ -105,10 +105,6 @@ func (f *fmter) Token() (t xml.Token, err error) {
 
 	// Return the token that would be the next one on the queue
 	return toks[0], nil
-}
-
-func (f *fmter) Skip() error {
-	return f.t.Skip()
 }
 
 func (f *fmter) getOpts(opts []FmtOption) {

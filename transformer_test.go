@@ -13,8 +13,6 @@ import (
 	"testing"
 )
 
-var _ TokenReader = (*xml.Decoder)(nil)
-
 type tokenizerTest struct {
 	Transform Transformer
 	Input     string
@@ -66,8 +64,8 @@ func TestInspect(t *testing.T) {
 			}
 		}
 	}
-	if tokens != 5 {
-		t.Fatalf("Got %d tokens but expected 5", tokens)
+	if tokens != 6 {
+		t.Fatalf("Got %d tokens but expected 6", tokens)
 	}
 }
 
