@@ -16,6 +16,13 @@ type Tokenizer interface {
 	Skip() error
 }
 
+// TokenWriter is anything that can encode tokens to an XML stream, including an
+// xml.Encoder.
+type TokenWriter interface {
+	EncodeToken(t xml.Token) error
+	Flush() error
+}
+
 // A Transformer returns a new Tokenizer that returns transformed tokens read
 // from src.
 type Transformer func(src Tokenizer) Tokenizer
@@ -27,7 +34,7 @@ type Transformer func(src Tokenizer) Tokenizer
 // returned.
 // If no error would be returned, Encode flushes the underlying encoder when it
 // is done.
-func Encode(e *xml.Encoder, t Tokenizer) (err error) {
+func Encode(e TokenWriter, t Tokenizer) (err error) {
 	defer func() {
 		if err == nil || err == io.EOF {
 			err = e.Flush()
