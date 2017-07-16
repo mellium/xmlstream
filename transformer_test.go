@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-var _ Tokenizer = (*xml.Decoder)(nil)
+var _ TokenReader = (*xml.Decoder)(nil)
 
 type tokenizerTest struct {
 	Transform Transformer

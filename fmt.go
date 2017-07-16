@@ -12,7 +12,7 @@ import (
 // Fmt returns a transformer that indents the given XML stream.  The default
 // indentation style is to remove non-significant whitespace, start elements on
 // a new line and indent two spaces per level.
-func Fmt(t Tokenizer, opts ...FmtOption) Tokenizer {
+func Fmt(t TokenReader, opts ...FmtOption) TokenReader {
 	f := &fmter{t: whitespaceRemover(t)}
 	f.getOpts(opts)
 	return f
@@ -43,7 +43,7 @@ type fmter struct {
 	indent  []byte
 	prefix  []byte
 	queue   []xml.Token
-	t       Tokenizer
+	t       TokenReader
 }
 
 func (f *fmter) Token() (t xml.Token, err error) {
