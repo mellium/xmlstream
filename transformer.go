@@ -20,13 +20,13 @@ type TokenWriter interface {
 // from src.
 type Transformer func(src xml.TokenReader) *xml.Decoder
 
-// Encode consumes a tokenizer and encodes any tokens that it outputs.
+// Encode consumes an xml.TokenReader and encodes any tokens that it outputs.
 // If an error is returned on the Decode or Encode side, it is returned
 // immediately.
 // Since Encode is defined as consuming the stream until the end, io.EOF is not
 // returned.
-// If no error would be returned, Encode flushes the underlying encoder when it
-// is done.
+// If no error would be returned, Encode flushes the TokenWriter when it is
+// done.
 func Encode(e TokenWriter, d xml.TokenReader) (err error) {
 	defer func() {
 		if err == nil || err == io.EOF {
