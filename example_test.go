@@ -15,6 +15,31 @@ import (
 	"mellium.im/xmlstream"
 )
 
+func ExampleReaderFunc() {
+	state := 0
+	start := xml.StartElement{Name: xml.Name{Local: "quote"}}
+	d := xmlstream.ReaderFunc(func() (xml.Token, error) {
+		switch state {
+		case 0:
+			state++
+			return start, nil
+		case 1:
+			state++
+			return xml.CharData("the rain it raineth every day"), nil
+		case 2:
+			state++
+			return start.End(), nil
+		default:
+			return nil, io.EOF
+		}
+	})
+
+	e := xml.NewEncoder(os.Stdout)
+	xmlstream.Encode(e, d)
+	// Output:
+	// <quote>the rain it raineth every day</quote>
+}
+
 func ExampleEncode() {
 	removequote := xmlstream.Remove(func(t xml.Token) bool {
 		switch tok := t.(type) {
