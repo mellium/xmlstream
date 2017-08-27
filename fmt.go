@@ -12,10 +12,10 @@ import (
 // Fmt returns a transformer that indents the given XML stream.
 // The default indentation style is to remove non-significant whitespace, start
 // elements on a new line and indent two spaces per level.
-func Fmt(d xml.TokenReader, opts ...FmtOption) *xml.Decoder {
+func Fmt(d xml.TokenReader, opts ...FmtOption) xml.TokenReader {
 	f := &fmter{d: xml.NewTokenDecoder(whitespaceRemover(d))}
 	f.getOpts(opts)
-	return xml.NewTokenDecoder(f)
+	return f
 }
 
 // FmtOption is used to configure a formatters behavior.

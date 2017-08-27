@@ -56,7 +56,7 @@ func TestInspect(t *testing.T) {
 	inspector := Inspect(func(t xml.Token) {
 		tokens++
 	})
-	d := inspector(xml.NewDecoder(strings.NewReader(`<quote>Now Jove,<br/>in his next commodity of hair, send thee a beard!</quote>`)))
+	d := xml.NewTokenDecoder(inspector(xml.NewDecoder(strings.NewReader(`<quote>Now Jove,<br/>in his next commodity of hair, send thee a beard!</quote>`))))
 	for tok, err := d.Token(); err != io.EOF; tok, err = d.Token() {
 		if start, ok := tok.(xml.StartElement); ok && start.Name.Local == "br" {
 			if err = d.Skip(); err == io.EOF {
