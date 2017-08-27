@@ -16,6 +16,25 @@ import (
 	"mellium.im/xmlstream"
 )
 
+func ExampleMultiReader() {
+	e := xml.NewEncoder(os.Stdout)
+	e.Indent("", "  ")
+
+	r1 := xml.NewDecoder(strings.NewReader(`<title>Dover Beach</title>`))
+	r2 := xml.NewDecoder(strings.NewReader(`<author>Matthew Arnold</author>`))
+	r3 := xml.NewDecoder(strings.NewReader(`<incipit>The sea is calm to-night.</incipit>`))
+
+	r := xmlstream.MultiReader(r1, r2, r3)
+
+	if err := xmlstream.Encode(e, r); err != nil {
+		log.Fatal("Error in MultiReader example:", err)
+	}
+	// Output:
+	// <title>Dover Beach</title>
+	// <author>Matthew Arnold</author>
+	// <incipit>The sea is calm to-night.</incipit>
+}
+
 func ExampleWrap() {
 	var r xml.TokenReader = xml.NewDecoder(strings.NewReader(`<body>No mind that ever lived stands firm in evil days, but goes astray.</body>`))
 	e := xml.NewEncoder(os.Stdout)
