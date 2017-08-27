@@ -35,7 +35,9 @@ func ExampleReaderFunc() {
 	})
 
 	e := xml.NewEncoder(os.Stdout)
-	xmlstream.Encode(e, d)
+	if err := xmlstream.Encode(e, d); err != nil {
+		log.Fatal("Error in func example:", err)
+	}
 	// Output:
 	// <quote>the rain it raineth every day</quote>
 }
@@ -52,10 +54,13 @@ func ExampleEncode() {
 	})
 
 	e := xml.NewEncoder(os.Stdout)
-	xmlstream.Encode(e, removequote(xml.NewDecoder(strings.NewReader(`
+	err := xmlstream.Encode(e, removequote(xml.NewDecoder(strings.NewReader(`
 <quote>
   <p>Foolery, sir, does walk about the orb, like the sun; it shines everywhere.</p>
 </quote>`))))
+	if err != nil {
+		log.Fatal("Error in Encode example:", err)
+	}
 	// Output:
 	// <p>Foolery, sir, does walk about the orb, like the sun; it shines everywhere.</p>
 }
