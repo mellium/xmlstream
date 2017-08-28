@@ -9,8 +9,8 @@ import (
 )
 
 // ReaderFunc type is an adapter to allow the use of ordinary functions as an
-// xml.TokenReader. If f is a function with the appropriate signature,
-// ReaderFunc(f) is an xml.TokenReader that calls f.
+// TokenReader. If f is a function with the appropriate signature,
+// ReaderFunc(f) is an TokenReader that calls f.
 type ReaderFunc func() (xml.Token, error)
 
 // Token calls f.

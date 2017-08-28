@@ -123,7 +123,7 @@ type PipeReader struct {
 	p *pipe
 }
 
-// Token implements the xml.TokenReader interface.
+// Token implements the TokenReader interface.
 // It reads a token from the pipe, blocking until a writer arrives or the write
 // end is closed. If the write end is closed with an error, that error is
 // returned as err; otherwise err is io.EOF.
@@ -177,7 +177,7 @@ func (w *PipeWriter) CloseWithError(err error) {
 }
 
 // Pipe creates a synchronous in-memory pipe of tokens.
-// It can be used to connect code expecting an xml.TokenReader
+// It can be used to connect code expecting an TokenReader
 // with code expecting an xmlstream.TokenWriter.
 //
 // Reads and Writes on the pipe are matched one to one.

@@ -22,7 +22,7 @@ func (eofReader) Token() (xml.Token, error) {
 }
 
 type multiReader struct {
-	readers []xml.TokenReader
+	readers []TokenReader
 }
 
 func (mr *multiReader) Token() (t xml.Token, err error) {
@@ -52,12 +52,12 @@ func (mr *multiReader) Token() (t xml.Token, err error) {
 	return nil, io.EOF
 }
 
-// MultiReader returns an xml.TokenReader that's the logical concatenation of
+// MultiReader returns an TokenReader that's the logical concatenation of
 // the provided input readers. They're read sequentially. Once all inputs have
 // returned io.EOF, Token will return io.EOF. If any of the readers return a
 // non-nil, non-EOF error, Token will return that error.
-func MultiReader(readers ...xml.TokenReader) xml.TokenReader {
-	r := make([]xml.TokenReader, len(readers))
+func MultiReader(readers ...TokenReader) TokenReader {
+	r := make([]TokenReader, len(readers))
 	copy(r, readers)
 	return &multiReader{r}
 }

@@ -16,18 +16,18 @@ type TokenWriter interface {
 	Flush() error
 }
 
-// A Transformer returns a new xml.TokenReader that returns transformed tokens
+// A Transformer returns a new TokenReader that returns transformed tokens
 // read from src.
-type Transformer func(src xml.TokenReader) xml.TokenReader
+type Transformer func(src TokenReader) TokenReader
 
-// Encode consumes an xml.TokenReader and encodes any tokens that it outputs.
+// Encode consumes an TokenReader and encodes any tokens that it outputs.
 // If an error is returned on the Decode or Encode side, it is returned
 // immediately.
 // Since Encode is defined as consuming the stream until the end, io.EOF is not
 // returned.
 // If no error would be returned, Encode flushes the TokenWriter when it is
 // done.
-func Encode(e TokenWriter, d xml.TokenReader) (err error) {
+func Encode(e TokenWriter, d TokenReader) (err error) {
 	defer func() {
 		if err == nil || err == io.EOF {
 			err = e.Flush()
@@ -50,7 +50,7 @@ func Encode(e TokenWriter, d xml.TokenReader) (err error) {
 // Inspect performs an operation for each token in the stream without
 // transforming the stream in any way.
 func Inspect(f func(t xml.Token)) Transformer {
-	return func(src xml.TokenReader) xml.TokenReader {
+	return func(src TokenReader) TokenReader {
 		return inspector{
 			d: src,
 			f: f,
@@ -59,7 +59,7 @@ func Inspect(f func(t xml.Token)) Transformer {
 }
 
 type inspector struct {
-	d xml.TokenReader
+	d TokenReader
 	f func(t xml.Token)
 }
 
@@ -75,7 +75,7 @@ func (t inspector) Token() (xml.Token, error) {
 // Map returns a Transformer that maps the tokens in the input using the given
 // mapping.
 func Map(mapping func(t xml.Token) xml.Token) Transformer {
-	return func(src xml.TokenReader) xml.TokenReader {
+	return func(src TokenReader) TokenReader {
 		return &mapper{
 			d: src,
 			f: mapping,
@@ -84,7 +84,7 @@ func Map(mapping func(t xml.Token) xml.Token) Transformer {
 }
 
 type mapper struct {
-	d xml.TokenReader
+	d TokenReader
 	f func(t xml.Token) xml.Token
 }
 
@@ -98,7 +98,7 @@ func (m *mapper) Token() (xml.Token, error) {
 
 // Remove returns a Transformer that removes tokens for which f matches.
 func Remove(f func(t xml.Token) bool) Transformer {
-	return func(src xml.TokenReader) xml.TokenReader {
+	return func(src TokenReader) TokenReader {
 		return remover{
 			d: src,
 			f: f,
@@ -107,7 +107,7 @@ func Remove(f func(t xml.Token) bool) Transformer {
 }
 
 type remover struct {
-	d xml.TokenReader
+	d TokenReader
 	f func(t xml.Token) bool
 }
 
@@ -127,7 +127,7 @@ func (r remover) Token() (t xml.Token, err error) {
 // RemoveElement returns a Transformer that removes entire elements (and their
 // children) if f matches the elements start token.
 func RemoveElement(f func(start xml.StartElement) bool) Transformer {
-	return func(src xml.TokenReader) xml.TokenReader {
+	return func(src TokenReader) TokenReader {
 		return &elementremover{
 			d: src,
 			f: f,
@@ -136,7 +136,7 @@ func RemoveElement(f func(start xml.StartElement) bool) Transformer {
 }
 
 type elementremover struct {
-	d xml.TokenReader
+	d TokenReader
 	f func(start xml.StartElement) bool
 }
 
@@ -164,7 +164,7 @@ func (er *elementremover) Token() (t xml.Token, err error) {
 // RemoveAttr returns a Transformer that removes attributes from
 // xml.StartElement's if f matches.
 func RemoveAttr(f func(start xml.StartElement, attr xml.Attr) bool) Transformer {
-	return func(src xml.TokenReader) xml.TokenReader {
+	return func(src TokenReader) TokenReader {
 		return &attrRemover{
 			d: src,
 			f: f,
@@ -173,7 +173,7 @@ func RemoveAttr(f func(start xml.StartElement, attr xml.Attr) bool) Transformer 
 }
 
 type attrRemover struct {
-	d xml.TokenReader
+	d TokenReader
 	f func(xml.StartElement, xml.Attr) bool
 }
 

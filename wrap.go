@@ -12,7 +12,7 @@ import (
 
 // Wrap wraps a token stream in a start element and its corresponding end
 // element.
-func Wrap(start xml.StartElement, r xml.TokenReader) xml.TokenReader {
+func Wrap(start xml.StartElement, r TokenReader) TokenReader {
 	state := 0
 	return ReaderFunc(func() (t xml.Token, err error) {
 		switch state {
@@ -42,7 +42,7 @@ func Wrap(start xml.StartElement, r xml.TokenReader) xml.TokenReader {
 // Unwrap returns a new token reader that skips the first token read from it
 // and, if it is a start element, also skips its corresponding end element.
 // If the element is not a start element it is returned along with an error.
-func Unwrap(r xml.TokenReader) xml.TokenReader {
+func Unwrap(r TokenReader) TokenReader {
 	var gotStart bool
 	var ok bool
 	var start xml.StartElement

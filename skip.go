@@ -20,7 +20,7 @@ import (
 // structures.
 // It returns nil if it finds an end element matching the start element;
 // otherwise it returns an error describing the problem.
-func Skip(r xml.TokenReader) error {
+func Skip(r TokenReader) error {
 	for {
 		tok, err := r.Token()
 		if err != nil {
