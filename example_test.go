@@ -16,6 +16,26 @@ import (
 	"mellium.im/xmlstream"
 )
 
+func ExampleSkip() {
+	e := xml.NewEncoder(os.Stdout)
+
+	r := xml.NewDecoder(strings.NewReader(`<par>I don't like to look out of the windows even—there are so many of those creeping women, and they creep so fast.</par><par>I wonder if they all come out of that wall paper, as I did?</par>`))
+
+	t, err := r.Token()
+	if _, ok := t.(xml.StartElement); !ok || err != nil {
+		log.Fatal("Did not find start element in Skip example or got an error:", err)
+	}
+	if err := xmlstream.Skip(r); err != nil && err != io.EOF {
+		log.Fatal("Error in skipping par:", err)
+	}
+	if err := xmlstream.Encode(e, r); err != nil {
+		log.Fatal("Error in Skip example:", err)
+	}
+
+	// Output:
+	// <par>I wonder if they all come out of that wall paper, as I did?</par>
+}
+
 func ExampleMultiReader() {
 	e := xml.NewEncoder(os.Stdout)
 	e.Indent("", "  ")

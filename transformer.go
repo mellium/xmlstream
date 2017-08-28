@@ -129,14 +129,14 @@ func (r remover) Token() (t xml.Token, err error) {
 func RemoveElement(f func(start xml.StartElement) bool) Transformer {
 	return func(src xml.TokenReader) xml.TokenReader {
 		return &elementremover{
-			d: xml.NewTokenDecoder(src),
+			d: src,
 			f: f,
 		}
 	}
 }
 
 type elementremover struct {
-	d *xml.Decoder
+	d xml.TokenReader
 	f func(start xml.StartElement) bool
 }
 
@@ -148,7 +148,7 @@ func (er *elementremover) Token() (t xml.Token, err error) {
 		}
 		if start, ok := t.(xml.StartElement); ok && er.f(start) {
 			// Skip the element and read a new token.
-			if err = er.d.Skip(); err != nil {
+			if err = Skip(er.d); err != nil {
 				return t, err
 			}
 			continue

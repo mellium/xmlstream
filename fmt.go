@@ -13,7 +13,7 @@ import (
 // The default indentation style is to remove non-significant whitespace, start
 // elements on a new line and indent two spaces per level.
 func Fmt(d xml.TokenReader, opts ...FmtOption) xml.TokenReader {
-	f := &fmter{d: xml.NewTokenDecoder(whitespaceRemover(d))}
+	f := &fmter{d: whitespaceRemover(d)}
 	f.getOpts(opts)
 	return f
 }
@@ -39,7 +39,7 @@ func Indent(s string) FmtOption {
 }
 
 type fmter struct {
-	d       *xml.Decoder
+	d       xml.TokenReader
 	nesting int
 	indent  []byte
 	prefix  []byte
