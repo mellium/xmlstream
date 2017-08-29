@@ -1,15 +1,3 @@
-.PHONEY: test
-test:
-	go test -cover ./...
-
-.PHONEY: bench
-bench:
-	go test -cover -bench . -benchmem -run 'Benchmark.*' ./...
-
-.PHONEY: vet
-vet:
-	go vet ./...
-
 # Requires graphviz
 deps.svg: *.go
 	(   echo "digraph G {"; \
