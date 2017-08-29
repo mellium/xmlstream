@@ -165,3 +165,70 @@ func TestInterleavedMultiReader(t *testing.T) {
 		t.Errorf(`Second mr2.Token() = (%q, %v), want (nil, io.EOF)`, tok, err)
 	}
 }
+
+// bufWriter is a TokenWriter that buffers the last token written to it and
+// counts how many writes have occured.
+type bufWriter struct {
+	b  xml.Token
+	wc int
+}
+
+func (w *bufWriter) EncodeToken(t xml.Token) error {
+	w.b = t
+	w.wc++
+	return nil
+}
+
+func (w *bufWriter) Flush() error {
+	return nil
+}
+
+// errWriter is a TokenWriter that always returns the provided error on any
+// write call.
+type errWriter struct {
+	err error
+}
+
+func (w *errWriter) EncodeToken(t xml.Token) error {
+	return w.err
+}
+
+func (w *errWriter) Flush() error {
+	return nil
+}
+
+func TestMultiWriter(t *testing.T) {
+	t.Run("Write", func(t *testing.T) {
+		b1, b2, b3 := new(bufWriter), new(bufWriter), new(bufWriter)
+		mw := xmlstream.MultiWriter(b1, b2, b3)
+
+		tok := xml.CharData("test")
+		if err := mw.EncodeToken(tok); err != nil {
+			t.Error("Write failed unexpectedly:", err)
+		}
+
+		if stok := string(tok); string(b1.b.(xml.CharData)) != stok || string(b2.b.(xml.CharData)) != stok || string(b3.b.(xml.CharData)) != stok {
+			t.Errorf("One of the tokens is not correct. want=%v, got=%v,%v,%v", tok, b1.b, b2.b, b3.b)
+		}
+		if b1.wc != 1 || b2.wc != 1 || b3.wc != 1 {
+			t.Errorf("Expected three single writes, got: %d, %d, %d", b1.wc, b2.wc, b3.wc)
+		}
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		b1, b2, b3 := new(bufWriter), &errWriter{errors.New("err")}, new(bufWriter)
+		mw := xmlstream.MultiWriter(b1, b2, b3)
+
+		tok := xml.CharData("test")
+		if err := mw.EncodeToken(tok); err.Error() != "err" {
+			t.Error("Write failed with unexpected error:", err)
+		}
+
+		if stok := string(tok); string(b1.b.(xml.CharData)) != stok || b3.b != nil {
+			t.Errorf("One of the tokens is not correct. want=(%v,nil) got=(%v,%v)", tok, b1.b, b3.b)
+		}
+		if b1.wc != 1 || b3.wc != 0 {
+			t.Errorf("Expected (1,0) writes, got: (%d,%d)", b1.wc, b3.wc)
+		}
+	})
+}

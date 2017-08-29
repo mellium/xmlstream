@@ -61,3 +61,35 @@ func MultiReader(readers ...xml.TokenReader) xml.TokenReader {
 	copy(r, readers)
 	return &multiReader{r}
 }
+
+type multiWriter struct {
+	writers []TokenWriter
+}
+
+func (mw *multiWriter) EncodeToken(t xml.Token) error {
+	for _, w := range mw.writers {
+		if err := w.EncodeToken(t); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (mw *multiWriter) Flush() error {
+	for _, w := range mw.writers {
+		if err := w.Flush(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// MultiWriter creates a writer that duplicates its writes to all the
+// provided writers, similar to the Unix tee(1) command.
+// If any of the writers return an error, the MultiWriter immediately returns
+// the error and stops writing.
+func MultiWriter(writers ...TokenWriter) TokenWriter {
+	w := make([]TokenWriter, len(writers))
+	copy(w, writers)
+	return &multiWriter{w}
+}
