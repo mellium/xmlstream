@@ -1,17 +1,16 @@
-PACKAGES=$$(go list ./... | grep -v '/vendor/')
-
 .PHONEY: test
 test:
-	go test -cover $(PACKAGES)
+	go test -cover ./...
 
 .PHONEY: bench
 bench:
-	go test -cover -bench . -benchmem -run 'Benchmark.*' $(PACKAGES)
+	go test -cover -bench . -benchmem -run 'Benchmark.*' ./...
 
 .PHONEY: vet
 vet:
-	go vet $(PACKAGES)
+	go vet ./...
 
+# Requires graphviz
 deps.svg: *.go
 	(   echo "digraph G {"; \
 	go list -f '{{range .Imports}}{{printf "\t%q -> %q;\n" $$.ImportPath .}}{{end}}' \
