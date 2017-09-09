@@ -28,7 +28,7 @@ func ExampleSkip() {
 	if err := xmlstream.Skip(r); err != nil && err != io.EOF {
 		log.Fatal("Error in skipping par:", err)
 	}
-	if err := xmlstream.Encode(e, r); err != nil {
+	if err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in Skip example:", err)
 	}
 
@@ -46,7 +46,7 @@ func ExampleMultiReader() {
 
 	r := xmlstream.MultiReader(r1, r2, r3)
 
-	if err := xmlstream.Encode(e, r); err != nil {
+	if err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in MultiReader example:", err)
 	}
 	// Output:
@@ -75,7 +75,7 @@ func ExampleReaderFunc() {
 	})
 
 	e := xml.NewEncoder(os.Stdout)
-	if err := xmlstream.Encode(e, d); err != nil {
+	if err := xmlstream.Copy(e, d); err != nil {
 		log.Fatal("Error in func example:", err)
 	}
 	// Output:
@@ -94,7 +94,7 @@ func ExampleEncode() {
 	})
 
 	e := xml.NewEncoder(os.Stdout)
-	err := xmlstream.Encode(e, removequote(xml.NewDecoder(strings.NewReader(`
+	err := xmlstream.Copy(e, removequote(xml.NewDecoder(strings.NewReader(`
 <quote>
   <p>Foolery, sir, does walk about the orb, like the sun; it shines everywhere.</p>
 </quote>`))))

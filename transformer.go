@@ -20,14 +20,12 @@ type TokenWriter interface {
 // read from src.
 type Transformer func(src TokenReader) TokenReader
 
-// Encode consumes an TokenReader and encodes any tokens that it outputs.
-// If an error is returned on the Decode or Encode side, it is returned
-// immediately.
-// Since Encode is defined as consuming the stream until the end, io.EOF is not
+// Copy consumes a TokenReader and writes its tokens to a TokenWriter.
+// If an error is returned by the reader or writer, copy returns it immediately.
+// Since Copy is defined as consuming the stream until the end, io.EOF is not
 // returned.
-// If no error would be returned, Encode flushes the TokenWriter when it is
-// done.
-func Encode(e TokenWriter, d TokenReader) (err error) {
+// If no error would be returned, Copy flushes the TokenWriter when it is done.
+func Copy(e TokenWriter, d TokenReader) (err error) {
 	defer func() {
 		if err == nil || err == io.EOF {
 			err = e.Flush()

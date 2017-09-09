@@ -27,7 +27,7 @@ func ExampleWrap() {
 		},
 	}, r)
 
-	if err := xmlstream.Encode(e, r); err != nil {
+	if err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in wrap example:", err)
 	}
 	// Output:
@@ -42,7 +42,7 @@ func ExampleUnwrap() {
 
 	r = xmlstream.Unwrap(r)
 
-	if err := xmlstream.Encode(e, r); err != nil {
+	if err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in unwrap example:", err)
 	}
 	// Output:
