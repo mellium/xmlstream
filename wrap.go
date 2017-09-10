@@ -1,6 +1,6 @@
 // Copyright 2017 Sam Whited.
-// Use of this source code is governed by the BSD 2-clause license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the BSD 2-clause
+// license that can be found in the LICENSE file.
 
 package xmlstream
 
@@ -12,7 +12,7 @@ import (
 
 // Wrap wraps a token stream in a start element and its corresponding end
 // element.
-func Wrap(start xml.StartElement, r TokenReader) TokenReader {
+func Wrap(r TokenReader, start xml.StartElement) TokenReader {
 	state := 0
 	return ReaderFunc(func() (t xml.Token, err error) {
 		switch state {

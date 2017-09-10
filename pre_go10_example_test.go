@@ -1,6 +1,6 @@
 // Copyright 2017 Sam Whited.
-// Use of this source code is governed by the BSD 2-clause license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the BSD 2-clause
+// license that can be found in the LICENSE file.
 
 // +build !go1.10
 
@@ -20,12 +20,12 @@ func ExampleWrap() {
 	e := xml.NewEncoder(os.Stdout)
 	e.Indent("", "  ")
 
-	r = xmlstream.Wrap(xml.StartElement{
+	r = xmlstream.Wrap(r, xml.StartElement{
 		Name: xml.Name{Local: "message"},
 		Attr: []xml.Attr{
 			{Name: xml.Name{Local: "from"}, Value: "ismene@example.org/Fo6Eeb2e"},
 		},
-	}, r)
+	})
 
 	if err := xmlstream.Encode(e, r); err != nil {
 		log.Fatal("Error in wrap example:", err)
