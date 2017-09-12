@@ -10,4 +10,7 @@ import (
 	"encoding/xml"
 )
 
+// A TokenReader is anything that can decode a stream of XML tokens, including
+// a Decoder.
+// For more information see the documentation for xml.TokenReader.
 type TokenReader = xml.TokenReader
