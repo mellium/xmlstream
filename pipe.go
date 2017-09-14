@@ -1,12 +1,12 @@
 // Copyright 2017 Sam Whited.
-// Use of this source code is governed by the BSD 2-clause license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the BSD 2-clause
+// license that can be found in the LICENSE file.
 //
 // Code in this file copied from the Go io package:
 //
 // Copyright 2009 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be found
-// in the LICENSE.GO file.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE.GO file.
 
 package xmlstream
 
