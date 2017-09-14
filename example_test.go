@@ -18,7 +18,7 @@ import (
 
 func ExampleLimitReader() {
 	e := xml.NewEncoder(os.Stdout)
-	var r xml.TokenReader = xml.NewDecoder(strings.NewReader(`<one>One hen</one><two>Two ducks</two>`))
+	var r xmlstream.TokenReader = xml.NewDecoder(strings.NewReader(`<one>One hen</one><two>Two ducks</two>`))
 
 	r = xmlstream.LimitReader(r, 3)
 
