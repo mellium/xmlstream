@@ -8,6 +8,7 @@ package xmlstream_test
 
 import (
 	"encoding/xml"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -40,12 +41,18 @@ func ExampleUnwrap() {
 	var r xml.TokenReader = xml.NewDecoder(strings.NewReader(`<message from="ismene@example.org/dIoK6Wi3"><body>No mind that ever lived stands firm in evil days, but goes astray.</body></message>`))
 	e := xml.NewEncoder(os.Stdout)
 
-	r = xmlstream.Unwrap(r)
+	r, tok, err := xmlstream.Unwrap(r)
+	if err != nil {
+		log.Fatal("Error unwraping:", err)
+	}
 
+	fmt.Printf("%s:\n", tok.(xml.StartElement).Name.Local)
 	if err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in unwrap example:", err)
 	}
+
 	// Output:
+	// message:
 	// <body>No mind that ever lived stands firm in evil days, but goes astray.</body>
 }
 

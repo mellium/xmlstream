@@ -6,7 +6,6 @@ package xmlstream
 
 import (
 	"encoding/xml"
-	"errors"
 	"io"
 )
 
@@ -39,31 +38,22 @@ func Wrap(r TokenReader, start xml.StartElement) TokenReader {
 	})
 }
 
-// Unwrap returns a new token reader that skips the first token read from it
-// and, if it is a start element, also skips its corresponding end element.
-// If the element is not a start element it is returned along with an error.
-func Unwrap(r TokenReader) TokenReader {
-	var gotStart bool
-	var ok bool
-	var start xml.StartElement
+// Unwrap reads the next token from the provided TokenReader and, if it is a
+// start element, returns a new TokenReader that skips the corresponding end
+// element. If the token is not a start element the original TokenReader is
+// returned.
+func Unwrap(r TokenReader) (TokenReader, xml.Token, error) {
+	t, err := r.Token()
+	if err != nil {
+		return r, t, err
+	}
+	start, ok := t.(xml.StartElement)
+	if !ok {
+		return r, t, err
+	}
+
 	depth := 0
 	return ReaderFunc(func() (t xml.Token, err error) {
-		if !gotStart {
-			t, err = r.Token()
-			gotStart = true
-			start, ok = t.(xml.StartElement)
-			if err == io.EOF {
-				err = nil
-			}
-			if ok {
-				t = nil
-			}
-			if !ok && err == nil {
-				err = errors.New("xmlstream: unwrap expected start element")
-				return t, err
-			}
-		}
-
 		t, err = r.Token()
 		switch tok := t.(type) {
 		case xml.StartElement:
@@ -80,5 +70,5 @@ func Unwrap(r TokenReader) TokenReader {
 		}
 
 		return t, err
-	})
+	}), t, err
 }
