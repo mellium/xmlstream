@@ -16,20 +16,6 @@ import (
 	"mellium.im/xmlstream"
 )
 
-func ExampleLimitReader() {
-	e := xml.NewEncoder(os.Stdout)
-	var r xmlstream.TokenReader = xml.NewDecoder(strings.NewReader(`<one>One hen</one><two>Two ducks</two>`))
-
-	r = xmlstream.LimitReader(r, 3)
-
-	if err := xmlstream.Copy(e, r); err != nil {
-		log.Fatal("Error in LimitReader example:", err)
-	}
-
-	// Output:
-	// <one>One hen</one>
-}
-
 func ExampleSkip() {
 	e := xml.NewEncoder(os.Stdout)
 
