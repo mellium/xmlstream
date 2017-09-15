@@ -8,6 +8,7 @@ package xmlstream_test
 
 import (
 	"encoding/xml"
+	"fmt"
 	"log"
 	"os"
 	"strings"
