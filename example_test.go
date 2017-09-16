@@ -21,10 +21,8 @@ func ExampleSkip() {
 
 	r := xml.NewDecoder(strings.NewReader(`<par>I don't like to look out of the windows even—there are so many of those creeping women, and they creep so fast.</par><par>I wonder if they all come out of that wall paper, as I did?</par>`))
 
-	t, err := r.Token()
-	if _, ok := t.(xml.StartElement); !ok || err != nil {
-		log.Fatal("Did not find start element in Skip example or got an error:", err)
-	}
+	r.Token() // <par>
+
 	if err := xmlstream.Skip(r); err != nil && err != io.EOF {
 		log.Fatal("Error in skipping par:", err)
 	}
