@@ -22,10 +22,17 @@ func Fmt(d TokenReader, opts ...FmtOption) TokenReader {
 type FmtOption func(*fmter)
 
 // Prefix is inserted at the start of every XML element in the stream.
-// The default prefix if this option is not specified is '\n'.
 func Prefix(s string) FmtOption {
 	return func(f *fmter) {
 		f.prefix = []byte(s)
+	}
+}
+
+// Suffix is inserted at the start of every XML element in the stream.
+// If no option is specified the default suffix is '\n'.
+func Suffix(s string) FmtOption {
+	return func(f *fmter) {
+		f.suffix = []byte(s)
 	}
 }
 
@@ -43,6 +50,7 @@ type fmter struct {
 	nesting int
 	indent  []byte
 	prefix  []byte
+	suffix  []byte
 	queue   []xml.Token
 }
 
@@ -56,11 +64,7 @@ func (f *fmter) Token() (t xml.Token, err error) {
 
 	t, err = f.d.Token()
 	if err != nil {
-		return
-	}
-
-	if _, ok := t.(xml.CharData); ok {
-		return t, nil
+		return t, err
 	}
 
 	toks := []xml.Token{}
@@ -72,6 +76,8 @@ func (f *fmter) Token() (t xml.Token, err error) {
 
 	// Add indentation
 	switch t.(type) {
+	case xml.CharData:
+		// Don't indent chardata
 	case xml.EndElement:
 		// Decrease the indentation level.
 		f.nesting--
@@ -98,6 +104,11 @@ func (f *fmter) Token() (t xml.Token, err error) {
 	// Add original token
 	toks = append(toks, t)
 
+	// Add suffix
+	if len(f.suffix) > 0 {
+		toks = append(toks, xml.CharData(f.suffix))
+	}
+
 	// Queue up all tokens but the first one
 	if len(toks) > 1 {
 		f.queue = append(f.queue, toks[1:]...)
@@ -109,7 +120,7 @@ func (f *fmter) Token() (t xml.Token, err error) {
 
 func (f *fmter) getOpts(opts []FmtOption) {
 	f.indent = []byte{' ', ' '}
-	f.prefix = []byte{'\n'}
+	f.suffix = []byte{'\n'}
 	for _, opt := range opts {
 		opt(f)
 	}

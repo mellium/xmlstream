@@ -122,7 +122,7 @@ func ExampleFmt_indentation() {
                  <!-- Chardata is not indented -->
   How now, my hearts! did you never see the picture
 of 'we three'?</p>
-</quote>`)), xmlstream.Prefix("\n"), xmlstream.Indent("    "))
+</quote>`)), xmlstream.Indent("    "))
 
 	buf := new(bytes.Buffer)
 	e := xml.NewEncoder(buf)
@@ -135,6 +135,7 @@ of 'we three'?</p>
 	// <quote>
 	//     <p>
 	//         <!-- Chardata is not indented -->
+	//
 	//   How now, my hearts! did you never see the picture
 	// of &#39;we three&#39;?
 	//     </p>
