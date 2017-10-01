@@ -20,21 +20,16 @@ func Wrap(r TokenReader, start xml.StartElement) TokenReader {
 			return start, nil
 		case 1:
 			t, err = r.Token()
-			if err == io.EOF {
-				state++
+			switch {
+			case t != nil && err == io.EOF:
 				err = nil
-			}
-			if t == nil {
+			case t == nil && err == io.EOF:
 				state++
 				t = start.End()
 			}
 			return t, err
-		case 2:
-			state++
-			return start.End(), io.EOF
-		default:
-			return nil, io.EOF
 		}
+		return nil, io.EOF
 	})
 }
 

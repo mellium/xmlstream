@@ -24,7 +24,10 @@ func Copy(e TokenWriter, d TokenReader) (err error) {
 	var tok xml.Token
 	for {
 		tok, err = d.Token()
-		if err != nil {
+		switch {
+		case err == io.EOF && tok != nil:
+			err = nil
+		case err != nil:
 			return err
 		}
 
