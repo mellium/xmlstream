@@ -72,3 +72,27 @@ func Unwrap(r TokenReader) (TokenReader, xml.Token, error) {
 		return t, err
 	}), t, err
 }
+
+// Inner returns a new TokenReader that returns nil, io.EOF when it consumes the
+// end element matching the most recent start element already consumed.
+func Inner(r TokenReader) TokenReader {
+	count := 1
+	return ReaderFunc(func() (xml.Token, error) {
+		if count < 1 {
+			return nil, io.EOF
+		}
+
+		t, err := r.Token()
+		switch t.(type) {
+		case xml.StartElement:
+			count++
+		case xml.EndElement:
+			count--
+			if count < 1 {
+				return nil, io.EOF
+			}
+		}
+
+		return t, err
+	})
+}
