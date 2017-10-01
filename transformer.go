@@ -6,7 +6,6 @@ package xmlstream
 
 import (
 	"encoding/xml"
-	"io"
 )
 
 // TokenWriter is anything that can encode tokens to an XML stream, including an
@@ -19,31 +18,6 @@ type TokenWriter interface {
 // A Transformer returns a new TokenReader that returns transformed tokens
 // read from src.
 type Transformer func(src TokenReader) TokenReader
-
-// Copy consumes a TokenReader and writes its tokens to a TokenWriter.
-// If an error is returned by the reader or writer, copy returns it immediately.
-// Since Copy is defined as consuming the stream until the end, io.EOF is not
-// returned.
-// If no error would be returned, Copy flushes the TokenWriter when it is done.
-func Copy(e TokenWriter, d TokenReader) (err error) {
-	defer func() {
-		if err == nil || err == io.EOF {
-			err = e.Flush()
-		}
-	}()
-
-	var tok xml.Token
-	for {
-		tok, err = d.Token()
-		if err != nil {
-			return err
-		}
-
-		if err = e.EncodeToken(tok); err != nil {
-			return err
-		}
-	}
-}
 
 // Inspect performs an operation for each token in the stream without
 // transforming the stream in any way.
