@@ -8,6 +8,18 @@ import (
 	"encoding/xml"
 )
 
+// Discard is a TokenWriter on which all Write calls succeed without doing
+// anything.
+func Discard() TokenWriter {
+	return discard{}
+}
+
+type discard struct{}
+
+func (discard) EncodeToken(_ xml.Token) error { return nil }
+
+func (discard) Flush() error { return nil }
+
 // TokenWriter is anything that can encode tokens to an XML stream, including an
 // xml.Encoder.
 type TokenWriter interface {

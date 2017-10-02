@@ -1,8 +1,8 @@
 // Copyright 2016 Sam Whited.
-// Use of this source code is governed by the BSD 2-clause license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the BSD 2-clause
+// license that can be found in the LICENSE file.
 
-package xmlstream
+package xmlstream_test
 
 import (
 	"bytes"
@@ -11,10 +11,22 @@ import (
 	"io"
 	"strings"
 	"testing"
+
+	"mellium.im/xmlstream"
 )
 
+func TestDiscard(t *testing.T) {
+	d := xmlstream.Discard()
+	if err := d.EncodeToken(xml.StartElement{}); err != nil {
+		t.Errorf("Unexpected error while discarding token: %v", err)
+	}
+	if err := d.Flush(); err != nil {
+		t.Errorf("Unexpected error while flushing: %v", err)
+	}
+}
+
 type tokenizerTest struct {
-	Transform Transformer
+	Transform xmlstream.Transformer
 	Input     string
 	Output    string
 	Err       bool
@@ -53,13 +65,13 @@ func runTests(t *testing.T, tcs []tokenizerTest) {
 
 func TestInspect(t *testing.T) {
 	tokens := 0
-	inspector := Inspect(func(t xml.Token) {
+	inspector := xmlstream.Inspect(func(t xml.Token) {
 		tokens++
 	})
 	d := inspector(xml.NewDecoder(strings.NewReader(`<quote>Now Jove,<br/>in his next commodity of hair, send thee a beard!</quote>`)))
 	for tok, err := d.Token(); err != io.EOF; tok, err = d.Token() {
 		if start, ok := tok.(xml.StartElement); ok && start.Name.Local == "br" {
-			if err = Skip(d); err == io.EOF {
+			if err = xmlstream.Skip(d); err == io.EOF {
 				break
 			}
 		}
@@ -72,13 +84,13 @@ func TestInspect(t *testing.T) {
 func TestRemove(t *testing.T) {
 	runTests(t, []tokenizerTest{
 		{
-			Transform: Remove(func(t xml.Token) bool { return true }),
+			Transform: xmlstream.Remove(func(t xml.Token) bool { return true }),
 			Input:     `<quote>Foolery, sir, does walk about the orb like the sun,<br/>it shines every where.</quote>`,
 			Output:    ``,
 			Err:       false,
 		},
 		{
-			Transform: Remove(func(t xml.Token) bool {
+			Transform: xmlstream.Remove(func(t xml.Token) bool {
 				if _, ok := t.(xml.CharData); ok {
 					return false
 				}
@@ -89,7 +101,7 @@ func TestRemove(t *testing.T) {
 			Err:    false,
 		},
 		{
-			Transform: Remove(func(t xml.Token) bool {
+			Transform: xmlstream.Remove(func(t xml.Token) bool {
 				if _, ok := t.(xml.StartElement); ok {
 					return true
 				}
@@ -105,7 +117,7 @@ func TestRemove(t *testing.T) {
 func TestMap(t *testing.T) {
 	runTests(t, []tokenizerTest{
 		{
-			Transform: Map(func(t xml.Token) xml.Token {
+			Transform: xmlstream.Map(func(t xml.Token) xml.Token {
 				switch tok := t.(type) {
 				case xml.StartElement:
 					if tok.Name.Local == "quote" {
@@ -130,7 +142,7 @@ func TestMap(t *testing.T) {
 func TestRemoveAttr(t *testing.T) {
 	runTests(t, []tokenizerTest{
 		{
-			Transform: RemoveAttr(func(_ xml.StartElement, _ xml.Attr) bool {
+			Transform: xmlstream.RemoveAttr(func(_ xml.StartElement, _ xml.Attr) bool {
 				return false
 			}),
 			Input:  `<quote act="1" scene="5" character="Feste">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
@@ -138,7 +150,7 @@ func TestRemoveAttr(t *testing.T) {
 			Err:    false,
 		},
 		{
-			Transform: RemoveAttr(func(_ xml.StartElement, _ xml.Attr) bool {
+			Transform: xmlstream.RemoveAttr(func(_ xml.StartElement, _ xml.Attr) bool {
 				return true
 			}),
 			Input:  `<!-- Quote --><quote act="1" scene="5" cite="Feste">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
@@ -146,7 +158,7 @@ func TestRemoveAttr(t *testing.T) {
 			Err:    false,
 		},
 		{
-			Transform: RemoveAttr(func(_ xml.StartElement, a xml.Attr) bool {
+			Transform: xmlstream.RemoveAttr(func(_ xml.StartElement, a xml.Attr) bool {
 				return a.Name.Local == "cite"
 			}),
 			Input:  `<quote act="1" cite="Feste" scene="5">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
@@ -154,7 +166,7 @@ func TestRemoveAttr(t *testing.T) {
 			Err:    false,
 		},
 		{
-			Transform: RemoveAttr(func(start xml.StartElement, a xml.Attr) bool {
+			Transform: xmlstream.RemoveAttr(func(start xml.StartElement, a xml.Attr) bool {
 				return start.Name.Local == "quote" && a.Name.Local == "cite"
 			}),
 			Input:  `<text cite="Feste"></text><quote act="1" cite="Feste" scene="5">Let her hang me: he that is well hanged in this world needs to fear no colours.</quote>`,
