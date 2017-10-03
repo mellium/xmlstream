@@ -6,6 +6,7 @@ package xmlstream
 
 import (
 	"encoding/xml"
+	"io"
 )
 
 // Discard is a TokenWriter on which all Write calls succeed without doing
@@ -25,6 +26,21 @@ func (discard) Flush() error { return nil }
 type TokenWriter interface {
 	EncodeToken(t xml.Token) error
 	Flush() error
+}
+
+// TokenReadWriter is the interface that groups the basic Token, EncodeToken,
+// and Flush methods.
+type TokenReadWriter interface {
+	TokenReader
+	TokenWriter
+}
+
+// TokenReadWriteCloser is the interface that groups the basic Token,
+// EncodeToken, Flush, and Close methods.
+type TokenReadWriteCloser interface {
+	TokenReader
+	TokenWriter
+	io.Closer
 }
 
 // A Transformer returns a new TokenReader that returns transformed tokens
