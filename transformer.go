@@ -43,6 +43,13 @@ type TokenReadWriteCloser interface {
 	io.Closer
 }
 
+// TokenWriteCloser is the interface that groups the basic EncodeToken, Flush,
+// and Close methods.
+type TokenWriteCloser interface {
+	TokenWriter
+	io.Closer
+}
+
 // A Transformer returns a new TokenReader that returns transformed tokens
 // read from src.
 type Transformer func(src TokenReader) TokenReader
