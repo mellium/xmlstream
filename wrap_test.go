@@ -27,7 +27,7 @@ func TestWrap(t *testing.T) {
 		2: {I: xmlstream.ReaderFunc(func() (xml.Token, error) {
 			return xml.CharData("inner"), io.EOF
 		}), O: `<test>inner</test>`},
-		3: {I: func() xml.TokenReader {
+		3: {I: func() xmlstream.TokenReader {
 			state := 0
 			return xmlstream.ReaderFunc(func() (xml.Token, error) {
 				if state > 0 {
