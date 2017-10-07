@@ -44,7 +44,7 @@ func TestWrap(t *testing.T) {
 
 			r := xmlstream.Wrap(tc.I, xml.StartElement{Name: xml.Name{Local: "test"}})
 
-			if err := xmlstream.Copy(e, r); err != tc.Err {
+			if _, err := xmlstream.Copy(e, r); err != tc.Err {
 				t.Errorf("Got unexpected error, want=`%v`, got=`%v`", tc.Err, err)
 			}
 
@@ -78,7 +78,7 @@ func TestUnwrap(t *testing.T) {
 				t.Errorf("Got unexpected error, want=`%v`, got=`%v`", tc.Err, err)
 			}
 
-			if err := xmlstream.Copy(e, r); err != nil {
+			if _, err := xmlstream.Copy(e, r); err != nil {
 				t.Fatal(err)
 			}
 
@@ -125,7 +125,7 @@ func TestInner(t *testing.T) {
 
 			r := xmlstream.Inner(d)
 
-			if err := xmlstream.Copy(e, r); err != nil {
+			if _, err := xmlstream.Copy(e, r); err != nil {
 				t.Fatal(err)
 			}
 

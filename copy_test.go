@@ -1,0 +1,100 @@
+// Copyright 2017 Sam Whited.
+// Use of this source code is governed by the BSD 2-clause
+// license that can be found in the LICENSE file.
+
+package xmlstream_test
+
+import (
+	"bytes"
+	"encoding/xml"
+	"fmt"
+	"io"
+	"strings"
+	"testing"
+
+	"mellium.im/xmlstream"
+)
+
+type copyTest struct {
+	r      xml.TokenReader
+	n      int
+	err    error
+	out    string
+	panics bool
+}
+
+var testErr = fmt.Errorf("Test Err")
+
+var copyTests = [...]copyTest{
+	0: {panics: true},
+	1: {
+		r:   xml.NewDecoder(strings.NewReader(`<t></t>`)),
+		n:   2,
+		out: `<t></t>`,
+	},
+	2: {
+		r: xmlstream.ReaderFunc(func() (t xml.Token, err error) {
+			return xml.CharData("Test"), io.EOF
+		}),
+		n:   1,
+		out: `Test`,
+		err: nil,
+	},
+	3: {
+		r: xmlstream.ReaderFunc(func() (t xml.Token, err error) {
+			return xml.CharData("Test"), testErr
+		}),
+		n:   0,
+		out: ``,
+		err: testErr,
+	},
+}
+
+func TestCopy(t *testing.T) {
+	for i, tc := range copyTests {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			defer func() {
+				r := recover()
+				switch {
+				case r == nil && tc.panics:
+					t.Errorf("Expected panic")
+				case r != nil && !tc.panics:
+					t.Errorf("Got unexpected panic")
+				}
+			}()
+			b := new(bytes.Buffer)
+			e := xml.NewEncoder(b)
+			n, err := xmlstream.Copy(e, tc.r)
+
+			if n != tc.n {
+				t.Errorf("Wrong number of tokens copied: want=`%d', got=`%d'", tc.n, n)
+			}
+			if err != tc.err {
+				t.Errorf("Unexpected error: want=`%v', got=`%v'", err, tc.err)
+			}
+			if o := b.String(); o != tc.out {
+				t.Errorf("Unexpected output: want=`%v', got=`%v'", tc.out, o)
+			}
+		})
+	}
+}
+
+type errTokenWriter struct{}
+
+func (errTokenWriter) EncodeToken(t xml.Token) error {
+	return testErr
+}
+
+func (errTokenWriter) Flush() error {
+	return nil
+}
+
+func TestCopyBadEncode(t *testing.T) {
+	n, err := xmlstream.Copy(errTokenWriter{}, xmlstream.Wrap(nil, xml.StartElement{Name: xml.Name{Local: "start"}}))
+	if n != 0 {
+		t.Errorf("Expected no tokens to be copied, got %d", n)
+	}
+	if err != testErr {
+		t.Errorf("Expected testErr to be returned, got %v", err)
+	}
+}

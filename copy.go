@@ -9,12 +9,15 @@ import (
 	"io"
 )
 
-// Copy consumes a TokenReader and writes its tokens to a TokenWriter.
+// Copy consumes a TokenReader and writes its tokens to a TokenWriter unti
+// leither io.EOF is reached on d or an error occurs.
+// It returns the number of tokens copied and the first error encountered while
+// copying, if any.
 // If an error is returned by the reader or writer, copy returns it immediately.
 // Since Copy is defined as consuming the stream until the end, io.EOF is not
 // returned.
 // If no error would be returned, Copy flushes the TokenWriter when it is done.
-func Copy(e TokenWriter, d TokenReader) (err error) {
+func Copy(e TokenWriter, d TokenReader) (n int, err error) {
 	defer func() {
 		if err == nil || err == io.EOF {
 			err = e.Flush()
@@ -24,15 +27,16 @@ func Copy(e TokenWriter, d TokenReader) (err error) {
 	var tok xml.Token
 	for {
 		tok, err = d.Token()
-		switch {
-		case err == io.EOF && tok != nil:
-			err = nil
-		case err != nil:
-			return err
+		if (err != nil && err != io.EOF) || (tok == nil && err == io.EOF) {
+			return n, err
 		}
 
-		if err = e.EncodeToken(tok); err != nil {
-			return err
+		if err := e.EncodeToken(tok); err != nil {
+			return n, err
+		}
+		n++
+		if err == io.EOF {
+			return n, nil
 		}
 	}
 }
