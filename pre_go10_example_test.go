@@ -28,7 +28,7 @@ func ExampleWrap() {
 		},
 	})
 
-	if err := xmlstream.Copy(e, r); err != nil {
+	if _, err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in wrap example:", err)
 	}
 	// Output:
@@ -47,7 +47,7 @@ func ExampleUnwrap() {
 	}
 
 	fmt.Printf("%s:\n", tok.(xml.StartElement).Name.Local)
-	if err := xmlstream.Copy(e, r); err != nil {
+	if _, err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in unwrap example:", err)
 	}
 
@@ -62,7 +62,7 @@ func ExampleLimitReader() {
 
 	r = xmlstream.LimitReader(r, 3)
 
-	if err := xmlstream.Copy(e, r); err != nil {
+	if _, err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in LimitReader example:", err)
 	}
 
