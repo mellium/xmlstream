@@ -16,6 +16,45 @@ import (
 	"mellium.im/xmlstream"
 )
 
+func TestWrap(t *testing.T) {
+	for i, tc := range [...]struct {
+		I   xmlstream.TokenReader
+		O   string
+		Err error
+	}{
+		0: {O: `<test></test>`},
+		1: {I: xml.NewDecoder(strings.NewReader(`<a/>`)), O: `<test><a></a></test>`},
+		2: {I: xmlstream.ReaderFunc(func() (xml.Token, error) {
+			return xml.CharData("inner"), io.EOF
+		}), O: `<test>inner</test>`},
+		3: {I: func() xml.TokenReader {
+			state := 0
+			return xmlstream.ReaderFunc(func() (xml.Token, error) {
+				if state > 0 {
+					return nil, io.EOF
+				}
+				state++
+				return xml.CharData("inner"), nil
+			})
+		}(), O: `<test>inner</test>`},
+	} {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			b := new(bytes.Buffer)
+			e := xml.NewEncoder(b)
+
+			r := xmlstream.Wrap(tc.I, xml.StartElement{Name: xml.Name{Local: "test"}})
+
+			if err := xmlstream.Copy(e, r); err != tc.Err {
+				t.Errorf("Got unexpected error, want=`%v`, got=`%v`", tc.Err, err)
+			}
+
+			if s := b.String(); s != tc.O {
+				t.Errorf("Invalid output, want=`%s`, got=`%s`", tc.O, s)
+			}
+		})
+	}
+}
+
 func TestUnwrap(t *testing.T) {
 	for i, tc := range [...]struct {
 		I   string
