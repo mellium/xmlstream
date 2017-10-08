@@ -9,7 +9,7 @@ import (
 	"io"
 )
 
-// Discard is a TokenWriter on which all Write calls succeed without doing
+// Discard returns a TokenWriter on which all calls succeed without doing
 // anything.
 func Discard() TokenWriter {
 	return discard{}
