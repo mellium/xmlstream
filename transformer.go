@@ -28,6 +28,12 @@ type TokenWriter interface {
 	Flush() error
 }
 
+// Marshaler is the interface implemented by objects that can marshal
+// themselves into valid XML elements by writing tokens.
+type Marshaler interface {
+	WriteXML(TokenWriter, xml.StartElement) error
+}
+
 // TokenReadWriter is the interface that groups the basic Token, EncodeToken,
 // and Flush methods.
 type TokenReadWriter interface {
