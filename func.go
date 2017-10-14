@@ -8,7 +8,7 @@ import (
 	"encoding/xml"
 )
 
-// ReaderFunc type is an adapter to allow the use of ordinary functions as an
+// ReaderFunc type is an adapter to allow the use of ordinary functions as a
 // TokenReader. If f is a function with the appropriate signature,
 // ReaderFunc(f) is an TokenReader that calls f.
 type ReaderFunc func() (xml.Token, error)
@@ -16,4 +16,19 @@ type ReaderFunc func() (xml.Token, error)
 // Token calls f.
 func (f ReaderFunc) Token() (xml.Token, error) {
 	return f()
+}
+
+// WriterFunc type is an adapter to allow the use of ordinary functions as a
+// TokenWriter with a nop Flush method. If f is a function with the appropriate
+// signature, WriterFunc(f) is an TokenWriter that calls f.
+type WriterFunc func(t xml.Token) error
+
+// EncodeToken calls f.
+func (f WriterFunc) EncodeToken(t xml.Token) error {
+	return f(t)
+}
+
+// Flush is a nop.
+func (WriterFunc) Flush() error {
+	return nil
 }
