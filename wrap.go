@@ -87,6 +87,9 @@ func Inner(r TokenReader) TokenReader {
 		}
 
 		t, err := r.Token()
+		if err != nil {
+			return nil, err
+		}
 		switch t.(type) {
 		case xml.StartElement:
 			count++
