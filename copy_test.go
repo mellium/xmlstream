@@ -79,14 +79,18 @@ func TestCopy(t *testing.T) {
 	}
 }
 
-func errTokenWriter(err error) xmlstream.WriterFunc {
-	return func(xml.Token) error {
-		return err
-	}
+type errTokenWriter struct{}
+
+func (errTokenWriter) EncodeToken(t xml.Token) error {
+	return testErr
+}
+
+func (errTokenWriter) Flush() error {
+	return nil
 }
 
 func TestCopyBadEncode(t *testing.T) {
-	n, err := xmlstream.Copy(errTokenWriter(testErr), xmlstream.Wrap(nil, xml.StartElement{Name: xml.Name{Local: "start"}}))
+	n, err := xmlstream.Copy(errTokenWriter{}, xmlstream.Wrap(nil, xml.StartElement{Name: xml.Name{Local: "start"}}))
 	if n != 0 {
 		t.Errorf("Expected no tokens to be copied, got %d", n)
 	}
