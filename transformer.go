@@ -28,10 +28,22 @@ type TokenWriter interface {
 	Flush() error
 }
 
-// Marshaler is the interface implemented by objects that can marshal
-// themselves into valid XML elements by writing tokens.
-type Marshaler interface {
-	WriteXML(TokenWriter, xml.StartElement) error
+// WriteTo writes tokens to w until there are no more tokens to write or when an
+// error occurs. The return value n is the number of tokens written. Any error
+// encountered during the write is also returned.
+//
+// The Copy function uses WriterTo if available.
+type WriterTo interface {
+	WriteXML(TokenWriter) (n int, err error)
+}
+
+// ReadFrom reads tokens from r until EOF or error. The return value n is the
+// number of tokens read. Any error except io.EOF encountered during the read is
+// also returned.
+//
+// The Copy function uses ReaderFrom if available.
+type ReaderFrom interface {
+	ReadXML(TokenReader) (n int, err error)
 }
 
 // TokenReadWriter is the interface that groups the basic Token, EncodeToken,

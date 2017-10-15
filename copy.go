@@ -17,7 +17,18 @@ import (
 // Since Copy is defined as consuming the stream until the end, io.EOF is not
 // returned.
 // If no error would be returned, Copy flushes the TokenWriter when it is done.
+//
+// If src implements the WriterTo interface, the copy is implemented by calling
+// src.WriteTo(dst). Otherwise, if dst implements the ReaderFrom interface, the
+// copy is implemented by calling dst.ReadFrom(src).
 func Copy(dst TokenWriter, src TokenReader) (n int, err error) {
+	if wt, ok := src.(WriterTo); ok {
+		return wt.WriteXML(dst)
+	}
+	if rt, ok := dst.(ReaderFrom); ok {
+		return rt.ReadXML(src)
+	}
+
 	defer func() {
 		if err == nil || err == io.EOF {
 			err = dst.Flush()
