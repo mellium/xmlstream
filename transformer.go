@@ -46,6 +46,12 @@ type ReaderFrom interface {
 	ReadXML(TokenReader) (n int, err error)
 }
 
+// Marshaler is the interface implemented by objects that can marshal themselves
+// into valid XML elements.
+type Marshaler interface {
+	TokenReader() TokenReader
+}
+
 // TokenReadWriter is the interface that groups the basic Token, EncodeToken,
 // and Flush methods.
 type TokenReadWriter interface {
