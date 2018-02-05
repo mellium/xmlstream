@@ -9,37 +9,42 @@ import (
 	"io"
 )
 
+type wrapReader struct {
+	state int
+	start xml.StartElement
+	r     TokenReader
+}
+
+func (wr *wrapReader) Token() (xml.Token, error) {
+	switch wr.state {
+	case 0:
+		wr.state++
+		if wr.r == nil {
+			wr.state++
+		}
+		return wr.start, nil
+	case 1:
+		t, err := wr.r.Token()
+		switch {
+		case t != nil && err == io.EOF:
+			err = nil
+			wr.state++
+		case t == nil && err == io.EOF:
+			wr.state += 2
+			t = wr.start.End()
+		}
+		return t, err
+	case 2:
+		wr.state++
+		return wr.start.End(), io.EOF
+	}
+	return nil, io.EOF
+}
+
 // Wrap wraps a token stream in a start element and its corresponding end
 // element.
 func Wrap(r TokenReader, start xml.StartElement) TokenReader {
-	state := 0
-	return ReaderFunc(func() (t xml.Token, err error) {
-		switch state {
-		case 0:
-			state++
-			if r == nil {
-				state++
-			}
-			return start, nil
-		case 1:
-			t, err = r.Token()
-			switch {
-			case t != nil && err == io.EOF:
-				err = nil
-				state++
-			case t == nil && err == io.EOF:
-				state += 2
-				t = start.End()
-			}
-			return t, err
-		case 2:
-			state++
-			t = start.End()
-			err = io.EOF
-			return t, err
-		}
-		return nil, io.EOF
-	})
+	return &wrapReader{r: r, start: start}
 }
 
 // Unwrap reads the next token from the provided TokenReader and, if it is a

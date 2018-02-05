@@ -139,3 +139,17 @@ func TestInner(t *testing.T) {
 		})
 	}
 }
+
+func TestWrapMallocs(t *testing.T) {
+	s := xml.StartElement{
+		Name: xml.Name{Local: "test"},
+	}
+	allocs := testing.AllocsPerRun(1000, func() {
+		_ = xmlstream.Wrap(nil, s)
+	})
+
+	const expected = 0
+	if allocs != expected {
+		t.Fatalf("Too many allocations want=%d, got=%f", expected, allocs)
+	}
+}
