@@ -12,7 +12,7 @@ import (
 type wrapReader struct {
 	state int
 	start xml.StartElement
-	r     TokenReader
+	r     xml.TokenReader
 }
 
 func (wr *wrapReader) Token() (xml.Token, error) {
@@ -43,7 +43,7 @@ func (wr *wrapReader) Token() (xml.Token, error) {
 
 // Wrap wraps a token stream in a start element and its corresponding end
 // element.
-func Wrap(r TokenReader, start xml.StartElement) TokenReader {
+func Wrap(r xml.TokenReader, start xml.StartElement) xml.TokenReader {
 	return &wrapReader{r: r, start: start}
 }
 
@@ -51,7 +51,7 @@ func Wrap(r TokenReader, start xml.StartElement) TokenReader {
 // start element, returns a new TokenReader that skips the corresponding end
 // element. If the token is not a start element the original TokenReader is
 // returned.
-func Unwrap(r TokenReader) (TokenReader, xml.Token, error) {
+func Unwrap(r xml.TokenReader) (xml.TokenReader, xml.Token, error) {
 	t, err := r.Token()
 	if err != nil {
 		return r, t, err
@@ -84,7 +84,7 @@ func Unwrap(r TokenReader) (TokenReader, xml.Token, error) {
 
 // Inner returns a new TokenReader that returns nil, io.EOF when it consumes the
 // end element matching the most recent start element already consumed.
-func Inner(r TokenReader) TokenReader {
+func Inner(r xml.TokenReader) xml.TokenReader {
 	count := 1
 	return ReaderFunc(func() (xml.Token, error) {
 		if count < 1 {

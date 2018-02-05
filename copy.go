@@ -9,8 +9,8 @@ import (
 	"io"
 )
 
-// Copy consumes a TokenReader and writes its tokens to a TokenWriter unti
-// leither io.EOF is reached on src or an error occurs.
+// Copy consumes a xml.TokenReader and writes its tokens to a TokenWriter until
+// either io.EOF is reached on src or an error occurs.
 // It returns the number of tokens copied and the first error encountered while
 // copying, if any.
 // If an error is returned by the reader or writer, copy returns it immediately.
@@ -21,7 +21,7 @@ import (
 // If src implements the WriterTo interface, the copy is implemented by calling
 // src.WriteTo(dst). Otherwise, if dst implements the ReaderFrom interface, the
 // copy is implemented by calling dst.ReadFrom(src).
-func Copy(dst TokenWriter, src TokenReader) (n int, err error) {
+func Copy(dst TokenWriter, src xml.TokenReader) (n int, err error) {
 	if wt, ok := src.(WriterTo); ok {
 		return wt.WriteXML(dst)
 	}

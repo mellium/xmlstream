@@ -21,7 +21,7 @@ import (
 // It returns nil if it finds an end element at the same nesting level as the
 // start element; otherwise it returns an error describing the problem.
 // Skip does not verify that the start and end elements match.
-func Skip(r TokenReader) error {
+func Skip(r xml.TokenReader) error {
 	for {
 		tok, err := r.Token()
 		if err != nil {

@@ -16,7 +16,7 @@ import (
 )
 
 type copyTest struct {
-	r      xmlstream.TokenReader
+	r      xml.TokenReader
 	n      int
 	err    error
 	out    string

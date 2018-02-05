@@ -45,7 +45,7 @@ func TestPipe1(t *testing.T) {
 	w.Close()
 }
 
-func reader(t *testing.T, r xmlstream.TokenReader, c chan xml.Token) {
+func reader(t *testing.T, r xml.TokenReader, c chan xml.Token) {
 	for {
 		tok, err := r.Token()
 		if err == io.EOF {

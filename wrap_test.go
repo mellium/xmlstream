@@ -18,7 +18,7 @@ import (
 
 func TestWrap(t *testing.T) {
 	for i, tc := range [...]struct {
-		I   xmlstream.TokenReader
+		I   xml.TokenReader
 		O   string
 		Err error
 	}{
@@ -27,7 +27,7 @@ func TestWrap(t *testing.T) {
 		2: {I: xmlstream.ReaderFunc(func() (xml.Token, error) {
 			return xml.CharData("inner"), io.EOF
 		}), O: `<test>inner</test>`},
-		3: {I: func() xmlstream.TokenReader {
+		3: {I: func() xml.TokenReader {
 			state := 0
 			return xmlstream.ReaderFunc(func() (xml.Token, error) {
 				if state > 0 {

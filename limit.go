@@ -9,9 +9,10 @@ import (
 	"io"
 )
 
-// LimitReader returns a TokenReader that reads from r but stops with EOF after
-// n tokens (regardless of the validity of the XML at that point in the stream).
-func LimitReader(r TokenReader, n uint) TokenReader {
+// LimitReader returns a xml.TokenReader that reads from r but stops with EOF
+// after n tokens (regardless of the validity of the XML at that point in the
+// stream).
+func LimitReader(r xml.TokenReader, n uint) xml.TokenReader {
 	return ReaderFunc(func() (xml.Token, error) {
 		if n <= 0 {
 			return nil, io.EOF
