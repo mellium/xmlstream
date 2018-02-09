@@ -28,18 +28,19 @@ type TokenWriter interface {
 	Flush() error
 }
 
-// WriteTo writes tokens to w until there are no more tokens to write or when an
-// error occurs. The return value n is the number of tokens written. Any error
-// encountered during the write is also returned.
+// WriterTo writes tokens to w until there are no more tokens to write or when
+// an error occurs.
+// The return value n is the number of tokens written.
+// Any error encountered during the write is also returned.
 //
 // The Copy function uses WriterTo if available.
 type WriterTo interface {
 	WriteXML(TokenWriter) (n int, err error)
 }
 
-// ReadFrom reads tokens from r until EOF or error. The return value n is the
-// number of tokens read. Any error except io.EOF encountered during the read is
-// also returned.
+// ReaderFrom reads tokens from r until EOF or error.
+// The return value n is the number of tokens read.
+// Any error except io.EOF encountered during the read is also returned.
 //
 // The Copy function uses ReaderFrom if available.
 type ReaderFrom interface {
