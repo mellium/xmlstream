@@ -1,15 +1,10 @@
-image: golang:1.10
+image: golang:1.11beta2-alpine
 pipelines:
   default:
     - step:
         script:
+          - apk update && apk add gcc libc-dev
           - go version
-          - apk update && apk add git
-          - go get github.com/golang/dep/cmd/dep
-          - mkdir -p "$GOPATH/src/mellium.im/"
-          - ln -s "`pwd`" "$GOPATH/src/mellium.im/xmlstream"
-          - cd "$GOPATH/src/mellium.im/xmlstream"
-          - dep ensure
           - go vet ./...
           - go test -race ./...
           - go test -cover ./...
