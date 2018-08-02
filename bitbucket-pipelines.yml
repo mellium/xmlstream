@@ -3,7 +3,7 @@ pipelines:
   default:
     - step:
         script:
-          - apk update && apk add gcc libc-dev
+          - apk update && apk add git gcc libc-dev
           - go version
           - go vet ./...
           - go test -race ./...
