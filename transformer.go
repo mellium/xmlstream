@@ -75,6 +75,13 @@ type TokenWriteCloser interface {
 	io.Closer
 }
 
+// TokenReadCloser is the interface that groups the basic Token and Close
+// methods.
+type TokenReadCloser interface {
+	xml.TokenReader
+	io.Closer
+}
+
 // A Transformer returns a new TokenReader that returns transformed tokens
 // read from src.
 type Transformer func(src xml.TokenReader) xml.TokenReader
