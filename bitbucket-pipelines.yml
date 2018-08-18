@@ -1,4 +1,4 @@
-image: golang:1.11beta3-alpine
+image: golang:1.11rc1-alpine
 pipelines:
   default:
     - step:
