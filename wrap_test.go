@@ -47,6 +47,9 @@ func TestWrap(t *testing.T) {
 			if _, err := xmlstream.Copy(e, r); err != tc.Err {
 				t.Errorf("Got unexpected error, want=`%v`, got=`%v`", tc.Err, err)
 			}
+			if err := e.Flush(); err != nil {
+				t.Errorf("Error flushing: %q", err)
+			}
 
 			if s := b.String(); s != tc.O {
 				t.Errorf("Invalid output, want=`%s`, got=`%s`", tc.O, s)
@@ -80,6 +83,9 @@ func TestUnwrap(t *testing.T) {
 
 			if _, err := xmlstream.Copy(e, r); err != nil {
 				t.Fatal(err)
+			}
+			if err := e.Flush(); err != nil {
+				t.Errorf("Error flushing: %q", err)
 			}
 
 			if s := b.String(); s != tc.O {
@@ -127,6 +133,9 @@ func TestInner(t *testing.T) {
 
 			if _, err := xmlstream.Copy(e, r); err != nil {
 				t.Fatal(err)
+			}
+			if err := e.Flush(); err != nil {
+				t.Errorf("Error flushing: %q", err)
 			}
 
 			if s := b.String(); s != tc.O {

@@ -16,7 +16,6 @@ import (
 // If an error is returned by the reader or writer, copy returns it immediately.
 // Since Copy is defined as consuming the stream until the end, io.EOF is not
 // returned.
-// If no error would be returned, Copy flushes the TokenWriter when it is done.
 //
 // If src implements the WriterTo interface, the copy is implemented by calling
 // src.WriteTo(dst). Otherwise, if dst implements the ReaderFrom interface, the
@@ -29,17 +28,14 @@ func Copy(dst TokenWriter, src xml.TokenReader) (n int, err error) {
 		return rt.ReadXML(src)
 	}
 
-	defer func() {
-		if err == nil || err == io.EOF {
-			err = dst.Flush()
-		}
-	}()
-
 	var tok xml.Token
 	for {
 		tok, err = src.Token()
-		if (err != nil && err != io.EOF) || (tok == nil && err == io.EOF) {
+		switch {
+		case err != nil && err != io.EOF:
 			return n, err
+		case tok == nil && err == io.EOF:
+			return n, nil
 		}
 
 		if err := dst.EncodeToken(tok); err != nil {

@@ -79,7 +79,11 @@ func (mw *multiWriter) EncodeToken(t xml.Token) error {
 
 func (mw *multiWriter) Flush() error {
 	for _, w := range mw.writers {
-		if err := w.Flush(); err != nil {
+		flusher, ok := w.(Flusher)
+		if !ok {
+			continue
+		}
+		if err := flusher.Flush(); err != nil {
 			return err
 		}
 	}

@@ -20,9 +20,6 @@ func TestDiscard(t *testing.T) {
 	if err := d.EncodeToken(xml.StartElement{}); err != nil {
 		t.Errorf("Unexpected error while discarding token: %v", err)
 	}
-	if err := d.Flush(); err != nil {
-		t.Errorf("Unexpected error while flushing: %v", err)
-	}
 }
 
 type tokenizerTest struct {

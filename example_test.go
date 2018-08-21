@@ -29,6 +29,9 @@ func ExampleSkip() {
 	if _, err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in Skip example:", err)
 	}
+	if err := e.Flush(); err != nil {
+		log.Fatal("Error flushing:", err)
+	}
 
 	// Output:
 	// <par>I wonder if they all come out of that wall paper, as I did?</par>
@@ -46,6 +49,9 @@ func ExampleMultiReader() {
 
 	if _, err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in MultiReader example:", err)
+	}
+	if err := e.Flush(); err != nil {
+		log.Fatal("Error flushing:", err)
 	}
 	// Output:
 	// <title>Dover Beach</title>
@@ -75,6 +81,9 @@ func ExampleReaderFunc() {
 	e := xml.NewEncoder(os.Stdout)
 	if _, err := xmlstream.Copy(e, d); err != nil {
 		log.Fatal("Error in func example:", err)
+	}
+	if err := e.Flush(); err != nil {
+		log.Fatal("Error flushing:", err)
 	}
 	// Output:
 	// <quote>the rain it raineth every day</quote>
@@ -191,6 +200,9 @@ func ExampleWrap() {
 	if _, err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in wrap example:", err)
 	}
+	if err := e.Flush(); err != nil {
+		log.Fatal("Error flushing:", err)
+	}
 	// Output:
 	// <message from="ismene@example.org/Fo6Eeb2e">
 	//   <body>No mind that ever lived stands firm in evil days, but goes astray.</body>
@@ -210,6 +222,9 @@ func ExampleUnwrap() {
 	if _, err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in unwrap example:", err)
 	}
+	if err := e.Flush(); err != nil {
+		log.Fatal("Error flushing:", err)
+	}
 
 	// Output:
 	// message:
@@ -224,6 +239,9 @@ func ExampleLimitReader() {
 
 	if _, err := xmlstream.Copy(e, r); err != nil {
 		log.Fatal("Error in LimitReader example:", err)
+	}
+	if err := e.Flush(); err != nil {
+		log.Fatal("Error flushing:", err)
 	}
 
 	// Output:

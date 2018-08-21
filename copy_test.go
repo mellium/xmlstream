@@ -65,12 +65,15 @@ func TestCopy(t *testing.T) {
 			b := new(bytes.Buffer)
 			e := xml.NewEncoder(b)
 			n, err := xmlstream.Copy(e, tc.r)
+			if e := e.Flush(); e != nil {
+				t.Fatalf("Unexpected error flushing: %q", e)
+			}
 
 			if n != tc.n {
 				t.Errorf("Wrong number of tokens copied: want=`%d', got=`%d'", tc.n, n)
 			}
 			if err != tc.err {
-				t.Errorf("Unexpected error: want=`%v', got=`%v'", err, tc.err)
+				t.Errorf("Unexpected error: want=`%v', got=`%v'", tc.err, err)
 			}
 			if o := b.String(); o != tc.out {
 				t.Errorf("Unexpected output: want=`%v', got=`%v'", tc.out, o)

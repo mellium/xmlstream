@@ -19,12 +19,15 @@ type discard struct{}
 
 func (discard) EncodeToken(_ xml.Token) error { return nil }
 
-func (discard) Flush() error { return nil }
-
 // TokenWriter is anything that can encode tokens to an XML stream, including an
 // xml.Encoder.
 type TokenWriter interface {
 	EncodeToken(t xml.Token) error
+}
+
+// The Flusher interface is implemented by TokenWriters that can flush buffered
+// data to an underlying receiver.
+type Flusher interface {
 	Flush() error
 }
 
