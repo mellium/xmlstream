@@ -9,6 +9,19 @@ import (
 	"io"
 )
 
+type token struct {
+	tok xml.Token
+}
+
+func (t token) Token() (xml.Token, error) {
+	return t.tok, io.EOF
+}
+
+// Token returns a token reader that always returns the given token and io.EOF.
+func Token(t xml.Token) xml.TokenReader {
+	return token{tok: t}
+}
+
 type wrapReader struct {
 	state int
 	start xml.StartElement

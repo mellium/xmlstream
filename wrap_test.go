@@ -16,6 +16,21 @@ import (
 	"mellium.im/xmlstream"
 )
 
+func TestToken(t *testing.T) {
+	chars := xml.CharData(`a comparable token`)
+	tr := xmlstream.Token(chars)
+
+	for i := 0; i < 2; i++ {
+		tok, err := tr.Token()
+		if string(tok.(xml.CharData)) != string(chars) {
+			t.Fatalf("First read got wrong token: want=%q, got=%q", chars, tok)
+		}
+		if err != io.EOF {
+			t.Fatalf("Wrong error: want=%q, got=%q", io.EOF, err)
+		}
+	}
+}
+
 func TestWrap(t *testing.T) {
 	for i, tc := range [...]struct {
 		I   xml.TokenReader
