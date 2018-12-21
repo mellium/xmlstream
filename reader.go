@@ -52,19 +52,23 @@ func InnerReader(r io.Reader) io.Reader {
 
 	// After the body has been read, pop the end token and verify that it matches
 	// the start token.
-	after := reader.After(lr, func() error {
+	after := reader.After(lr, func(n int, err error) (int, error) {
+		if err != io.EOF {
+			return n, err
+		}
+
 		tok, err := d.RawToken()
 		if err != nil {
-			return err
+			return n, err
 		}
 		rawend, ok := tok.(xml.EndElement)
 		switch {
 		case !ok:
-			return errNotEnd
+			return n, errNotEnd
 		case rawend != end:
-			return unexpectedEndError{rawend.Name}
+			return n, unexpectedEndError{rawend.Name}
 		}
-		return nil
+		return n, nil
 	})
 
 	// Before we read the body, pop the start token and set the length on the

@@ -1,3 +1,3 @@
 module mellium.im/xmlstream
 
-require mellium.im/reader v0.0.4
+require mellium.im/reader v0.1.0
