@@ -17,7 +17,7 @@ The package may be used under the terms of the BSD 2-Clause License a copy of
 which may be found in the [LICENSE] file.
 Some code in this package may have been copied from Go and is used under the
 terms of Go's modified BSD license, a copy of which can be found in the
-[LICENSE.GO] file.
+[LICENSE-GO] file.
 
 [LICENSE]: ./LICENSE
-[LICENSE.GO]: ./LICENSE.GO
+[LICENSE-GO]: ./LICENSE-GO
