@@ -8,10 +8,10 @@ tasks:
       go version
       go env
   - test: |
-      cd xmlstream.git/
+      cd xmlstream/
       go test -v -cover ./...
   - lint: |
-      cd xmlstream.git/
+      cd xmlstream/
       go vet ./...
       gofmt -s -l . && [ -z "$(gofmt -s -l .)" ]
 
