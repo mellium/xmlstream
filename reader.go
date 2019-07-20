@@ -30,6 +30,18 @@ func (u unexpectedEndError) Error() string {
 	return fmt.Sprintf("Unexpected end element </%s:%s>", u.name.Local, u.name.Space)
 }
 
+type nopCloser struct {
+	xml.TokenReader
+}
+
+func (nopCloser) Close() error { return nil }
+
+// NopCloser returns a TokenReadCloser with a no-op Close method wrapping
+// the provided Reader r.
+func NopCloser(r xml.TokenReader) TokenReadCloser {
+	return nopCloser{r}
+}
+
 // TODO: We almost certainly need to expose the start token somehow, but I can't
 //       think of a clean API to do it.
 
