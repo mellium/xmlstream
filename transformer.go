@@ -78,6 +78,14 @@ type TokenWriteCloser interface {
 	io.Closer
 }
 
+// TokenWriteFlushCloser is the interface that groups the basic EncodeToken,
+// Flush, and Close methods.
+type TokenWriteFlushCloser interface {
+	TokenWriter
+	io.Closer
+	Flusher
+}
+
 // TokenReadCloser is the interface that groups the basic Token and Close
 // methods.
 type TokenReadCloser interface {
