@@ -208,8 +208,7 @@ func (er *elementremover) Token() (t xml.Token, err error) {
 	}
 }
 
-// BUG(ssw): Multiple uses of RemoveAttr will iterate over the attr list
-//           multiple times.
+// BUG(ssw): Multiple uses of RemoveAttr will iterate over the attr list multiple times.
 
 // RemoveAttr returns a Transformer that removes attributes from
 // xml.StartElement's if f matches.
