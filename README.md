@@ -5,6 +5,7 @@
 [![Build Status](https://builds.sr.ht/~samwhited/xmlstream.svg)](https://builds.sr.ht/~samwhited/xmlstream?)
 
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png)](https://www.buymeacoffee.com/samwhited)
+[![Support Me](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/SamWhited/donate)
 
 An experimental API for manipulating streams of XML data.
 
