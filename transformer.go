@@ -93,6 +93,22 @@ type TokenReadCloser interface {
 	io.Closer
 }
 
+// Encoder is the interface that groups the Encode, EncodeElement, and
+// EncodeToken methods.
+// Encoder is implemented by xml.Encoder.
+type Encoder interface {
+	TokenWriter
+	Encode(v interface{}) error
+	EncodeElement(v interface{}, start xml.StartElement) error
+}
+
+// TokenReadEncoder is the interface that groups the Encode, EncodeElement,
+// EncodeToken, and Token methods.
+type TokenReadEncoder interface {
+	xml.TokenReader
+	Encoder
+}
+
 // A Transformer returns a new TokenReader that returns transformed tokens
 // read from src.
 type Transformer func(src xml.TokenReader) xml.TokenReader

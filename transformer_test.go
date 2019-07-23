@@ -15,6 +15,8 @@ import (
 	"mellium.im/xmlstream"
 )
 
+var _ xmlstream.Encoder = (*xml.Encoder)(nil)
+
 func TestDiscard(t *testing.T) {
 	d := xmlstream.Discard()
 	if err := d.EncodeToken(xml.StartElement{}); err != nil {
