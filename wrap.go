@@ -22,42 +22,13 @@ func Token(t xml.Token) xml.TokenReader {
 	return token{tok: t}
 }
 
-type wrapReader struct {
-	state int
-	start xml.StartElement
-	r     xml.TokenReader
-}
-
-func (wr *wrapReader) Token() (xml.Token, error) {
-	switch wr.state {
-	case 0:
-		wr.state++
-		if wr.r == nil {
-			wr.state++
-		}
-		return wr.start, nil
-	case 1:
-		t, err := wr.r.Token()
-		switch {
-		case t != nil && err == io.EOF:
-			err = nil
-			wr.state++
-		case t == nil && err == io.EOF:
-			wr.state += 2
-			t = wr.start.End()
-		}
-		return t, err
-	case 2:
-		wr.state++
-		return wr.start.End(), io.EOF
-	}
-	return nil, io.EOF
-}
-
 // Wrap wraps a token stream in a start element and its corresponding end
 // element.
 func Wrap(r xml.TokenReader, start xml.StartElement) xml.TokenReader {
-	return &wrapReader{r: r, start: start}
+	if r == nil {
+		return newMultiReader(Token(start), Token(start.End()))
+	}
+	return newMultiReader(Token(start), r, Token(start.End()))
 }
 
 // Unwrap reads the next token from the provided TokenReader and, if it is a
