@@ -85,6 +85,7 @@ func TestUnwrap(t *testing.T) {
 		2: {`<msg>Test</msg>`, `Test`, xml.StartElement{Name: xml.Name{Local: "msg"}, Attr: []xml.Attr{}}, nil},
 		3: {`<msg><msg>Test</msg></msg>`, `<msg>Test</msg>`, xml.StartElement{Name: xml.Name{Local: "msg"}, Attr: []xml.Attr{}}, nil},
 		4: {`<msg>A<msg>Test</msg>B</msg>`, `A<msg>Test</msg>B`, xml.StartElement{Name: xml.Name{Local: "msg"}, Attr: []xml.Attr{}}, nil},
+		5: {`<msg>Foo</msg><remain/>`, `Foo<remain></remain>`, xml.StartElement{Name: xml.Name{Local: "msg"}, Attr: []xml.Attr{}}, nil},
 	} {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			b := new(bytes.Buffer)

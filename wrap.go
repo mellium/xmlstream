@@ -40,30 +40,12 @@ func Unwrap(r xml.TokenReader) (xml.TokenReader, xml.Token, error) {
 	if err != nil {
 		return r, t, err
 	}
-	start, ok := t.(xml.StartElement)
+	_, ok := t.(xml.StartElement)
 	if !ok {
 		return r, t, err
 	}
 
-	depth := 0
-	return ReaderFunc(func() (t xml.Token, err error) {
-		t, err = r.Token()
-		switch tok := t.(type) {
-		case xml.StartElement:
-			if tok.Name == start.Name {
-				depth++
-			}
-		case xml.EndElement:
-			if tok.Name == start.Name {
-				depth--
-				if depth == -1 {
-					t, err = r.Token()
-				}
-			}
-		}
-
-		return t, err
-	}), t, err
+	return MultiReader(Inner(r), r), t, nil
 }
 
 // Inner returns a new TokenReader that returns nil, io.EOF when it consumes the
