@@ -26,9 +26,9 @@ func Token(t xml.Token) xml.TokenReader {
 // element.
 func Wrap(r xml.TokenReader, start xml.StartElement) xml.TokenReader {
 	if r == nil {
-		return newMultiReader(Token(start), Token(start.End()))
+		return &multiReader{readers: []xml.TokenReader{Token(start), Token(start.End())}}
 	}
-	return newMultiReader(Token(start), r, Token(start.End()))
+	return &multiReader{readers: []xml.TokenReader{Token(start), r, Token(start.End())}}
 }
 
 // Unwrap reads the next token from the provided TokenReader and, if it is a

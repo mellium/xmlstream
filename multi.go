@@ -61,11 +61,7 @@ func (mr *multiReader) Token() (t xml.Token, err error) {
 func MultiReader(readers ...xml.TokenReader) xml.TokenReader {
 	r := make([]xml.TokenReader, len(readers))
 	copy(r, readers)
-	return newMultiReader(r...)
-}
-
-func newMultiReader(readers ...xml.TokenReader) xml.TokenReader {
-	return &multiReader{readers}
+	return &multiReader{readers: readers}
 }
 
 type multiWriter struct {
