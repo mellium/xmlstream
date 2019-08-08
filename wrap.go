@@ -13,13 +13,16 @@ type token struct {
 	tok xml.Token
 }
 
-func (t token) Token() (xml.Token, error) {
-	return t.tok, io.EOF
+func (t *token) Token() (xml.Token, error) {
+	tok := t.tok
+	t.tok = nil
+	return tok, io.EOF
 }
 
-// Token returns a token reader that always returns the given token and io.EOF.
+// Token returns a reader that returns the given token and io.EOF, then nil
+// io.EOF thereafter.
 func Token(t xml.Token) xml.TokenReader {
-	return token{tok: t}
+	return &token{tok: t}
 }
 
 // Wrap wraps a token stream in a start element and its corresponding end
