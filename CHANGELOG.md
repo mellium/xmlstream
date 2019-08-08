@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## v0.14.0 — 2019-08-08
+
+### Changed
+
+- Only return the token from `Token` once, then return `io.EOF`.
+
+
 ## v0.13.6 — 2019-08-06
 
 ### Added
