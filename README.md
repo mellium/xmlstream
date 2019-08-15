@@ -7,11 +7,14 @@
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png)](https://www.buymeacoffee.com/samwhited)
 [![Support Me](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/SamWhited/donate)
 
-An experimental API for manipulating streams of XML data.
+An API for manipulating XML streams in Go; [`io`] but for XML.
 
 ```go
 import "mellium.im/xmlstream"
 ```
+
+[`io`]: https://golang.org/pkg/io/
+
 
 ## License
 
