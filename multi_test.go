@@ -167,7 +167,7 @@ func TestInterleavedMultiReader(t *testing.T) {
 }
 
 // bufWriter is a TokenWriter that buffers the last token written to it and
-// counts how many writes have occured.
+// counts how many writes have occurred.
 type bufWriter struct {
 	b  xml.Token
 	wc int
