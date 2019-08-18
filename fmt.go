@@ -54,6 +54,14 @@ type fmter struct {
 	queue   []xml.Token
 }
 
+func (f *fmter) addIndent(toks []xml.Token) []xml.Token {
+	if len(f.indent) > 0 && f.nesting > 0 {
+		indent := xml.CharData(bytes.Repeat(f.indent, f.nesting))
+		toks = append(toks, indent)
+	}
+	return toks
+}
+
 func (f *fmter) Token() (t xml.Token, err error) {
 	// If we've queued up a token to write next, go ahead and pop the next token
 	// off the queue.
@@ -82,23 +90,14 @@ func (f *fmter) Token() (t xml.Token, err error) {
 		// Decrease the indentation level.
 		f.nesting--
 
-		if len(f.indent) > 0 && f.nesting > 0 {
-			indent := xml.CharData(bytes.Repeat(f.indent, f.nesting))
-			toks = append(toks, indent)
-		}
+		toks = f.addIndent(toks)
 	case xml.StartElement:
-		if len(f.indent) > 0 && f.nesting > 0 {
-			indent := xml.CharData(bytes.Repeat(f.indent, f.nesting))
-			toks = append(toks, indent)
-		}
+		toks = f.addIndent(toks)
 
 		// Increase the indentation level.
 		f.nesting++
 	default:
-		if len(f.indent) > 0 && f.nesting > 0 {
-			indent := xml.CharData(bytes.Repeat(f.indent, f.nesting))
-			toks = append(toks, indent)
-		}
+		toks = f.addIndent(toks)
 	}
 
 	// Add original token
