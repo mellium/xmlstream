@@ -4,6 +4,15 @@ packages:
 sources:
   - https://github.com/mellium/xmlstream
 tasks:
+  - setup: |
+      go version
+      go env
+
+      go get -u golang.org/x/lint/golint
+      go get -u github.com/securego/gosec/cmd/gosec
+      go get -u git.sr.ht/~samwhited/checkdoc
+
+      echo 'export PATH=$(go env GOPATH)/bin:$PATH' >> ~/.buildenv
   - info: |
       go version
       go env
@@ -15,5 +24,10 @@ tasks:
       go vet ./...
       gofmt -s -l . && [ -z "$(gofmt -s -l .)" ]
 
-      # This will modify go.mod, so do it last.
-      go run golang.org/x/lint/golint ./...
+      golint -set_exit_status ./...
+      gosec ./...
+      checkdoc ./...
+  - validate: |
+      cd xmlstream/
+      go mod tidy
+      git diff --exit-code -- go.mod go.sum
