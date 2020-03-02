@@ -77,3 +77,40 @@ func Inner(r xml.TokenReader) xml.TokenReader {
 		return t, err
 	})
 }
+
+// Skip reads tokens until it has consumed the end element matching the most
+// recent start element already consumed.
+// It recurs if it encounters a start element, so it can be used to skip nested
+// structures.
+// It returns nil if it finds an end element at the same nesting level as the
+// start element; otherwise it returns an error describing the problem.
+// Skip does not verify that the start and end elements match.
+func Skip(r xml.TokenReader) error {
+	for {
+		tok, err := r.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			if err := Skip(r); err != nil {
+				return err
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// LimitReader returns a xml.TokenReader that reads from r but stops with EOF
+// after n tokens (regardless of the validity of the XML at that point in the
+// stream).
+func LimitReader(r xml.TokenReader, n uint) xml.TokenReader {
+	return ReaderFunc(func() (xml.Token, error) {
+		if n <= 0 {
+			return nil, io.EOF
+		}
+		n--
+		return r.Token()
+	})
+}
