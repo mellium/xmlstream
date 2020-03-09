@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 - Dropped support for versions of Go before 1.13
 
+### Added
+
+- A mechanism for iterating over child elements
+
 
 ## v0.14.0 — 2019-08-08
 
