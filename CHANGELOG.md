@@ -11,6 +11,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - A mechanism for iterating over child elements
+- The `DecodeCloser` interface
+- The `DecodeEncoder` interface
+- The `Decoder` interface
+- The `EncodeCloser` interface
 
 
 ## v0.14.0 — 2019-08-08

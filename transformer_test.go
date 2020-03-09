@@ -16,6 +16,7 @@ import (
 )
 
 var _ xmlstream.Encoder = (*xml.Encoder)(nil)
+var _ xmlstream.Decoder = (*xml.Decoder)(nil)
 
 func TestDiscard(t *testing.T) {
 	d := xmlstream.Discard()

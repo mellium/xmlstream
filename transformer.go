@@ -78,6 +78,18 @@ type TokenWriteCloser interface {
 	io.Closer
 }
 
+// EncodeCloser is the interface that groups Encoder and io.Closer.
+type EncodeCloser interface {
+	Encoder
+	io.Closer
+}
+
+// DecodeCloser is the interface that groups Decoder and io.Closer.
+type DecodeCloser interface {
+	Decoder
+	io.Closer
+}
+
 // TokenWriteFlushCloser is the interface that groups the basic EncodeToken,
 // Flush, and Close methods.
 type TokenWriteFlushCloser interface {
@@ -100,6 +112,22 @@ type Encoder interface {
 	TokenWriter
 	Encode(v interface{}) error
 	EncodeElement(v interface{}, start xml.StartElement) error
+}
+
+// Decoder is the interface that groups the Decode, DecodeElement, and Token
+// methods.
+// Decoder is implemented by xml.Decoder.
+type Decoder interface {
+	xml.TokenReader
+	Decode(v interface{}) error
+	DecodeElement(v interface{}, start *xml.StartElement) error
+}
+
+// DecodeEncoder is the interface that groups the Encoder and Decoder
+// interfaces.
+type DecodeEncoder interface {
+	Decoder
+	Encoder
 }
 
 // TokenReadEncoder is the interface that groups the Encode, EncodeElement,
