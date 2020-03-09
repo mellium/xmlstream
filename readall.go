@@ -24,6 +24,9 @@ func ReadAll(r xml.TokenReader) ([]xml.Token, error) {
 			}
 			return toks, nil
 		case nil:
+			if t == nil {
+				return toks, nil
+			}
 			toks = append(toks, xml.CopyToken(t))
 		default:
 			return toks, err

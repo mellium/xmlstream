@@ -15,6 +15,7 @@ import (
 	"errors"
 	"io"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -231,4 +232,24 @@ func TestMultiWriter(t *testing.T) {
 			t.Errorf("Expected (1,0) writes, got: (%d,%d)", b1.wc, b3.wc)
 		}
 	})
+}
+
+func TestNoEOF(t *testing.T) {
+	// Decoders don't return an io.EOF, so we have to check for nil, nil too
+	// otherwise the multireader will terminate early.
+	buf := &strings.Builder{}
+	e := xml.NewEncoder(buf)
+
+	d := xmlstream.MultiReader(xml.NewTokenDecoder(xmlstream.Wrap(nil, aStart)), xmlstream.Wrap(nil, fooStart))
+	_, err := xmlstream.Copy(e, d)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if err := e.Flush(); err != nil {
+		t.Fatalf("error flushing buffer: %v", err)
+	}
+	const expected = `<a></a><foo></foo>`
+	if out := buf.String(); out != expected {
+		t.Errorf("wrong output: want=%q, got=%q", expected, out)
+	}
 }

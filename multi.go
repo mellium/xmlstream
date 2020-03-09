@@ -35,13 +35,13 @@ func (mr *multiReader) Token() (t xml.Token, err error) {
 			}
 		}
 		t, err = mr.readers[0].Token()
-		if err == io.EOF {
+		if err == io.EOF || (t == nil && err == nil) {
 			// Use eofReader instead of nil to avoid nil panic
 			// after performing flatten (https://golang.org/issue/18232).
 			mr.readers[0] = eofReader{} // permit earlier GC
 			mr.readers = mr.readers[1:]
 		}
-		if t != nil || err != io.EOF {
+		if t != nil || (err != nil && err != io.EOF) {
 			if err == io.EOF && len(mr.readers) > 0 {
 				// Don't return EOF yet. More readers remain.
 				err = nil

@@ -48,6 +48,13 @@ var copyTests = [...]copyTest{
 		out: ``,
 		err: testErr,
 	},
+	4: {
+		// Make sure that we don't try to encode nil tokens or enter an infinite
+		// loop when TokenDecoders return nil, nil.
+		r:   xml.NewTokenDecoder(xmlstream.Wrap(nil, xml.StartElement{Name: xml.Name{Local: "test"}})),
+		n:   2,
+		out: `<test></test>`,
+	},
 }
 
 func TestCopy(t *testing.T) {

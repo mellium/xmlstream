@@ -20,23 +20,28 @@ var (
 )
 
 var readAllTests = [...]struct {
-	in  string
+	in  xml.TokenReader
 	out []xml.Token
 	err error
 }{
-	0: {in: `<a></a>`, out: []xml.Token{aStart, aStart.End()}},
-	1: {in: `<a>a</a>`, out: []xml.Token{aStart, xml.CharData("a"), aStart.End()}},
-	2: {in: `<a>a</a><foo/>`, out: []xml.Token{
+	0: {in: xml.NewDecoder(strings.NewReader(`<a></a>`)), out: []xml.Token{aStart, aStart.End()}},
+	1: {in: xml.NewDecoder(strings.NewReader(`<a>a</a>`)), out: []xml.Token{aStart, xml.CharData("a"), aStart.End()}},
+	2: {in: xml.NewDecoder(strings.NewReader(`<a>a</a><foo/>`)), out: []xml.Token{
 		aStart, xml.CharData("a"), aStart.End(),
 		fooStart, fooStart.End(),
 	}},
+	3: {
+		// Make sure that we don't try to encode nil tokens or enter an infinite
+		// loop when TokenDecoders return nil, nil.
+		in:  xml.NewTokenDecoder(xmlstream.Wrap(nil, xml.StartElement{Name: xml.Name{Local: "a"}})),
+		out: []xml.Token{aStart, aStart.End()},
+	},
 }
 
 func TestReadAll(t *testing.T) {
 	for i, tc := range readAllTests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			d := xml.NewDecoder(strings.NewReader(tc.in))
-			toks, err := xmlstream.ReadAll(d)
+			toks, err := xmlstream.ReadAll(tc.in)
 			if err != tc.err {
 				t.Fatalf("Unexpected error: want=%q, got=%q", tc.err, err)
 			}

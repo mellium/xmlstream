@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - Dropped support for versions of Go before 1.13
 
+
 ### Added
 
 - A mechanism for iterating over child elements
@@ -15,6 +16,12 @@ All notable changes to this project will be documented in this file.
 - The `DecodeEncoder` interface
 - The `Decoder` interface
 - The `EncodeCloser` interface
+
+
+## Fixed
+
+- Previously errors or infinite loops could occur in Copy, MultiReader, and
+  ReadAll when an underlying xml.Decoder's Token method returned "nil, nil"
 
 
 ## v0.14.0 — 2019-08-08

@@ -36,6 +36,8 @@ func Copy(dst TokenWriter, src xml.TokenReader) (n int, err error) {
 			return n, err
 		case tok == nil && err == io.EOF:
 			return n, nil
+		case tok == nil && err == nil:
+			return n, nil
 		}
 
 		if err := dst.EncodeToken(tok); err != nil {
