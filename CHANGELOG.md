@@ -2,12 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
 
-### Breaking
-
-- Dropped support for versions of Go before 1.13
-
+## v0.15.0 — 2020-03-17
 
 ### Added
 
@@ -18,7 +14,12 @@ All notable changes to this project will be documented in this file.
 - The `EncodeCloser` interface
 
 
-## Fixed
+### Changed
+
+- Bump the language version to Go 1.13
+
+
+### Fixed
 
 - Previously errors or infinite loops could occur in Copy, MultiReader, and
   ReadAll when an underlying xml.Decoder's Token method returned "nil, nil"
