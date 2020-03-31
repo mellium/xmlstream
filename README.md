@@ -1,5 +1,6 @@
 # mellium.im/xmlstream
 
+[![Issue Tracker][badge]](https://github.com/mellium/xmpp/issues)
 [![GoDoc](https://godoc.org/mellium.im/xmlstream?status.svg)](https://pkg.go.dev/mellium.im/xmlstream)
 [![Chat](https://inverse.chat/badge.svg?room=mellium@conference.samwhited.com)](https://conversations.im/j/mellium@conference.samwhited.com)
 [![License](https://img.shields.io/badge/license-FreeBSD-blue.svg)](https://opensource.org/licenses/BSD-2-Clause)
@@ -32,6 +33,7 @@ in the work by you shall be licensed as above, without any additional terms or
 conditions.
 
 
+[badge]: https://img.shields.io/badge/style-mellium%2fxmpp-green.svg?longCache=true&style=popout-square&label=issues
 [`io`]: https://golang.org/pkg/io/
 [CONTRIBUTING.md]: https://github.com/mellium/xmpp/blob/master/docs/CONTRIBUTING.md
 [LICENSE]: ./LICENSE
