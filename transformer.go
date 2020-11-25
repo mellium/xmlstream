@@ -98,6 +98,13 @@ type TokenWriteFlushCloser interface {
 	Flusher
 }
 
+// TokenWriteFlusher is the interface that groups the basic EncodeToken, and
+// Flush methods.
+type TokenWriteFlusher interface {
+	TokenWriter
+	Flusher
+}
+
 // TokenReadCloser is the interface that groups the basic Token and Close
 // methods.
 type TokenReadCloser interface {

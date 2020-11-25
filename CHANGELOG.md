@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.15.1 — 2020-11-24
+
+### Added
+
+- The `TokenWriteFlusher` interface
+
 
 ## v0.15.0 — 2020-03-17
 
