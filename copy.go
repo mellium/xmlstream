@@ -18,8 +18,8 @@ import (
 // returned.
 //
 // If src implements the WriterTo interface, the copy is implemented by calling
-// src.WriteTo(dst). Otherwise, if dst implements the ReaderFrom interface, the
-// copy is implemented by calling dst.ReadFrom(src).
+// src.WriteXML(dst). Otherwise, if dst implements the ReaderFrom interface, the
+// copy is implemented by calling dst.ReadXML(src).
 func Copy(dst TokenWriter, src xml.TokenReader) (n int, err error) {
 	if wt, ok := src.(WriterTo); ok {
 		return wt.WriteXML(dst)
