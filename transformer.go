@@ -298,3 +298,42 @@ func (ar *attrRemover) Token() (xml.Token, error) {
 
 	return start, nil
 }
+
+// Insert adds one XML stream to another just before the close token, matching
+// on the token name.
+// If either component of the name is empty it is considered a wildcard.
+func Insert(name xml.Name, m Marshaler) Transformer {
+	return func(r xml.TokenReader) xml.TokenReader {
+		var inner xml.TokenReader
+		return ReaderFunc(func() (xml.Token, error) {
+			if inner != nil {
+				tok, err := inner.Token()
+				switch {
+				case tok != nil && err == io.EOF:
+					inner = nil
+					return tok, nil
+				case tok == nil && err == io.EOF:
+					inner = nil
+				default:
+					return tok, err
+				}
+			}
+
+			tok, err := r.Token()
+			if err != nil {
+				return tok, err
+			}
+
+			if end, ok := tok.(xml.EndElement); ok &&
+				((name.Space == "" && name.Local == "") ||
+					end.Name == name ||
+					(end.Name.Space == name.Space && name.Local == "") ||
+					(end.Name.Local == name.Local && name.Space == "")) {
+				inner = MultiReader(m.TokenReader(), Token(end))
+				return inner.Token()
+			}
+
+			return tok, err
+		})
+	}
+}

@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - The `InnerElement` transformer
+- The `Insert` transformer
 
 
 ## v0.15.1 — 2020-11-24

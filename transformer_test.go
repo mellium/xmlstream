@@ -175,3 +175,76 @@ func TestRemoveAttr(t *testing.T) {
 		},
 	})
 }
+
+var insertTestCases = [...]struct {
+	name xml.Name
+	in   string
+	out  string
+}{
+	0: {},
+	1: {
+		name: xml.Name{Space: "jabber:client", Local: "message"},
+		in:   `<message xmlns="jabber:client"/>`,
+		out:  `<message xmlns="jabber:client"><test></test></message>`,
+	},
+	2: {
+		name: xml.Name{Space: "jabber:server", Local: "message"},
+		in:   `<message xmlns="jabber:server"/><message xmlns="jabber:server"><body>test</body></message><message></message>`,
+		out:  `<message xmlns="jabber:server"><test></test></message><message xmlns="jabber:server"><body xmlns="jabber:server">test</body><test></test></message><message></message>`,
+	},
+	3: {
+		name: xml.Name{Space: "jabber:server", Local: "message"},
+		in:   `<message xmlns="jabber:badns"/>`,
+		out:  `<message xmlns="jabber:badns"></message>`,
+	},
+	4: {
+		name: xml.Name{Space: "", Local: "message"},
+		in:   `<message xmlns="urn:example"/><message/>`,
+		out:  `<message xmlns="urn:example"><test></test></message><message><test></test></message>`,
+	},
+	5: {
+		name: xml.Name{Space: "urn:example", Local: ""},
+		in:   `<message xmlns="urn:example"/><presence/><iq xmlns="urn:example"/>`,
+		out:  `<message xmlns="urn:example"><test></test></message><presence></presence><iq xmlns="urn:example"><test></test></iq>`,
+	},
+	6: {
+		name: xml.Name{Space: "", Local: ""},
+		in:   `<message xmlns="urn:example"/><presence/><iq xmlns="urn:example"/>`,
+		out:  `<message xmlns="urn:example"><test></test></message><presence><test></test></presence><iq xmlns="urn:example"><test></test></iq>`,
+	},
+}
+
+type testPayload struct{}
+
+func (testPayload) TokenReader() xml.TokenReader {
+	return xmlstream.Wrap(
+		nil,
+		xml.StartElement{Name: xml.Name{Local: "test"}},
+	)
+}
+
+func TestInsert(t *testing.T) {
+	for i, tc := range insertTestCases {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			inserter := xmlstream.Insert(tc.name, testPayload{})
+			r := inserter(xml.NewDecoder(strings.NewReader(tc.in)))
+			// Prevent duplicate xmlns attributes. See https://mellium.im/issue/75
+			r = xmlstream.RemoveAttr(func(start xml.StartElement, attr xml.Attr) bool {
+				return (start.Name.Local == "message" || start.Name.Local == "iq") && attr.Name.Local == "xmlns"
+			})(r)
+			var buf strings.Builder
+			e := xml.NewEncoder(&buf)
+			_, err := xmlstream.Copy(e, r)
+			if err != nil {
+				t.Fatalf("error encoding: %v", err)
+			}
+			if err = e.Flush(); err != nil {
+				t.Fatalf("error flushing: %v", err)
+			}
+
+			if out := buf.String(); tc.out != out {
+				t.Errorf("wrong output:\nwant=%s,\n got=%s", tc.out, out)
+			}
+		})
+	}
+}
