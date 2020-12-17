@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Added
+
+- The `InnerElement` transformer
+
+
 ## v0.15.1 — 2020-11-24
 
 ### Added

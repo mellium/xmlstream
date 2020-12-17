@@ -54,9 +54,20 @@ func Unwrap(r xml.TokenReader) (xml.TokenReader, xml.Token, error) {
 // Inner returns a new TokenReader that returns nil, io.EOF when it consumes the
 // end element matching the most recent start element already consumed.
 func Inner(r xml.TokenReader) xml.TokenReader {
-	count := 1
+	return innerElement(r, false)
+}
+
+// InnerElement wraps a TokenReader to return nil, io.EOF after returning the
+// end element matching the most recent start element already consumed.
+// It is like Inner except that it returns the end element.
+func InnerElement(r xml.TokenReader) xml.TokenReader {
+	return innerElement(r, true)
+}
+
+func innerElement(r xml.TokenReader, returnOuter bool) xml.TokenReader {
+	var count int
 	return ReaderFunc(func() (xml.Token, error) {
-		if count < 1 {
+		if count < 0 {
 			return nil, io.EOF
 		}
 
@@ -69,7 +80,7 @@ func Inner(r xml.TokenReader) xml.TokenReader {
 			count++
 		case xml.EndElement:
 			count--
-			if count < 1 {
+			if !returnOuter && count < 0 {
 				return nil, io.EOF
 			}
 		}

@@ -171,6 +171,61 @@ func TestInner(t *testing.T) {
 	}
 }
 
+func TestInnerElement(t *testing.T) {
+	for i, tc := range [...]struct {
+		N   int
+		I   string
+		O   string
+		Err error
+	}{
+		0: {Err: io.EOF},
+		1: {I: `Test<test/>Test`, O: `Test<test></test>Test`},
+		2: {I: `<msg>Test</msg><a></a>`},
+		3: {N: 1, I: `<msg><msg>Test</msg></msg><no/>`, O: `<msg><msg>Test</msg></msg>`},
+		4: {I: `<msg>A<msg>Test</msg>B</msg>`},
+		5: {N: 2, I: `<msg>A<!proc>B</msg><no/>`, O: `<msg>A<!proc>B</msg>`},
+		6: {N: 1, I: `<msg></msg><no></no>`, O: `<msg></msg>`},
+	} {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			b := new(bytes.Buffer)
+			d := xml.NewDecoder(strings.NewReader(tc.I))
+			e := xml.NewEncoder(b)
+
+			// Encode the first N tokens outside of the inner reader.
+			for i := 0; i < tc.N; i++ {
+				tok, err := d.Token()
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = e.EncodeToken(tok)
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			r := xmlstream.InnerElement(d)
+
+			if _, err := xmlstream.Copy(e, r); err != nil {
+				t.Fatal(err)
+			}
+			if err := e.Flush(); err != nil {
+				t.Errorf("Error flushing: %q", err)
+			}
+
+			if tc.O == "" {
+				tc.O = tc.I
+			}
+			if s := b.String(); s != tc.O {
+				t.Errorf("Invalid output, want=`%s`, got=`%s`", tc.O, s)
+			}
+
+			if _, err := r.Token(); err != io.EOF {
+				t.Error("Expected token stream to continue returning io.EOF")
+			}
+		})
+	}
+}
+
 func TestWrapMallocs(t *testing.T) {
 	s := xml.StartElement{
 		Name: xml.Name{Local: "test"},
