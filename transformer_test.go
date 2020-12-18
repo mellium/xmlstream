@@ -248,3 +248,54 @@ func TestInsert(t *testing.T) {
 		})
 	}
 }
+
+var insertFTestCases = [...]struct {
+	f   func(xml.StartElement, xmlstream.TokenWriter) error
+	in  string
+	out string
+}{
+	0: {},
+	1: {
+		f: func(start xml.StartElement, w xmlstream.TokenWriter) error {
+			return nil
+		},
+		in:  `<message foo="bar"><foo/></message>`,
+		out: `<message foo="bar"><foo></foo></message>`,
+	},
+	2: {
+		in:  `<message foo="bar"><foo/></message>`,
+		out: `<message foo="bar"><foo></foo></message>`,
+	},
+	3: {
+		f: func(start xml.StartElement, w xmlstream.TokenWriter) error {
+			start = xml.StartElement{Name: xml.Name{Local: "test"}}
+			w.EncodeToken(start)
+			w.EncodeToken(start.End())
+			return nil
+		},
+		in:  `<message foo="bar"><foo/></message>`,
+		out: `<message foo="bar"><test></test><foo><test></test></foo></message>`,
+	},
+}
+
+func TestInsertFunc(t *testing.T) {
+	for i, tc := range insertFTestCases {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			inserter := xmlstream.InsertFunc(tc.f)
+			r := inserter(xml.NewDecoder(strings.NewReader(tc.in)))
+			var buf strings.Builder
+			e := xml.NewEncoder(&buf)
+			_, err := xmlstream.Copy(e, r)
+			if err != nil {
+				t.Fatalf("error encoding: %v", err)
+			}
+			if err = e.Flush(); err != nil {
+				t.Fatalf("error flushing: %v", err)
+			}
+
+			if out := buf.String(); tc.out != out {
+				t.Errorf("wrong output:\nwant=%s,\n got=%s", tc.out, out)
+			}
+		})
+	}
+}

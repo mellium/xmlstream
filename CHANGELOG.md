@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - The `InnerElement` transformer
+- The `InsertFunc` transformer
 - The `Insert` transformer
 
 

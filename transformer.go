@@ -299,6 +299,42 @@ func (ar *attrRemover) Token() (xml.Token, error) {
 	return start, nil
 }
 
+// InsertFunc calls f after writing any start element to the stream.
+// The function can decide based on the passed in StartElement whether to insert
+// any additional tokens into the stream by writing them to w.
+func InsertFunc(f func(xml.StartElement, TokenWriter) error) Transformer {
+	if f == nil {
+		f = func(xml.StartElement, TokenWriter) error { return nil }
+	}
+
+	var pr *PipeReader
+	return func(r xml.TokenReader) xml.TokenReader {
+		return ReaderFunc(func() (xml.Token, error) {
+			if pr != nil {
+				tok, err := pr.Token()
+				if tok != nil || err != io.EOF {
+					return tok, err
+				}
+				pr = nil
+			}
+
+			tok, err := r.Token()
+			if err != nil {
+				return tok, err
+			}
+			if start, ok := tok.(xml.StartElement); ok {
+				var pw *PipeWriter
+				pr, pw = Pipe()
+				go func() {
+					pw.CloseWithError(f(start, pw))
+				}()
+			}
+
+			return tok, err
+		})
+	}
+}
+
 // Insert adds one XML stream to another just before the close token, matching
 // on the token name.
 // If either component of the name is empty it is considered a wildcard.
