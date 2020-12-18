@@ -132,7 +132,7 @@ func (r *PipeReader) Token() (t xml.Token, err error) {
 }
 
 // Close closes the PipeReader; subsequent reads from the read half of the pipe
-// will return no bytes and EOF.
+// will return a nil token and EOF.
 func (r *PipeReader) Close() error {
 	r.CloseWithError(nil)
 	return nil
@@ -164,7 +164,7 @@ func (w *PipeWriter) Flush() error {
 }
 
 // Close closes the PipeWriter; subsequent reads from the read half of the pipe
-// will return no bytes and EOF.
+// will return a nil token and EOF.
 func (w *PipeWriter) Close() error {
 	w.CloseWithError(nil)
 	return nil
