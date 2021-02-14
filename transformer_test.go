@@ -250,13 +250,13 @@ func TestInsert(t *testing.T) {
 }
 
 var insertFTestCases = [...]struct {
-	f   func(xml.StartElement, xmlstream.TokenWriter) error
+	f   func(xml.StartElement, uint64, xmlstream.TokenWriter) error
 	in  string
 	out string
 }{
 	0: {},
 	1: {
-		f: func(start xml.StartElement, w xmlstream.TokenWriter) error {
+		f: func(start xml.StartElement, depth uint64, w xmlstream.TokenWriter) error {
 			return nil
 		},
 		in:  `<message foo="bar"><foo/></message>`,
@@ -267,7 +267,7 @@ var insertFTestCases = [...]struct {
 		out: `<message foo="bar"><foo></foo></message>`,
 	},
 	3: {
-		f: func(start xml.StartElement, w xmlstream.TokenWriter) error {
+		f: func(start xml.StartElement, depth uint64, w xmlstream.TokenWriter) error {
 			start = xml.StartElement{Name: xml.Name{Local: "test"}}
 			w.EncodeToken(start)
 			w.EncodeToken(start.End())
@@ -275,6 +275,18 @@ var insertFTestCases = [...]struct {
 		},
 		in:  `<message foo="bar"><foo/></message>`,
 		out: `<message foo="bar"><test></test><foo><test></test></foo></message>`,
+	},
+	4: {
+		f: func(start xml.StartElement, depth uint64, w xmlstream.TokenWriter) error {
+			if depth == 2 {
+				start = xml.StartElement{Name: xml.Name{Local: "test"}}
+				w.EncodeToken(start)
+				w.EncodeToken(start.End())
+			}
+			return nil
+		},
+		in:  `<message foo="bar"><foo/></message>`,
+		out: `<message foo="bar"><foo><test></test></foo></message>`,
 	},
 }
 

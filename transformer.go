@@ -302,11 +302,12 @@ func (ar *attrRemover) Token() (xml.Token, error) {
 // InsertFunc calls f after writing any start element to the stream.
 // The function can decide based on the passed in StartElement whether to insert
 // any additional tokens into the stream by writing them to w.
-func InsertFunc(f func(xml.StartElement, TokenWriter) error) Transformer {
+func InsertFunc(f func(start xml.StartElement, level uint64, w TokenWriter) error) Transformer {
 	if f == nil {
-		f = func(xml.StartElement, TokenWriter) error { return nil }
+		f = func(xml.StartElement, uint64, TokenWriter) error { return nil }
 	}
 
+	var depth uint64
 	var pr *PipeReader
 	return func(r xml.TokenReader) xml.TokenReader {
 		return ReaderFunc(func() (xml.Token, error) {
@@ -322,12 +323,18 @@ func InsertFunc(f func(xml.StartElement, TokenWriter) error) Transformer {
 			if err != nil {
 				return tok, err
 			}
-			if start, ok := tok.(xml.StartElement); ok {
+			switch t := tok.(type) {
+			case xml.StartElement:
+				depth++
 				var pw *PipeWriter
 				pr, pw = Pipe()
 				go func() {
-					pw.CloseWithError(f(start, pw))
+					pw.CloseWithError(f(t, depth, pw))
 				}()
+			case xml.EndElement:
+				if depth > 0 {
+					depth--
+				}
 			}
 
 			return tok, err
