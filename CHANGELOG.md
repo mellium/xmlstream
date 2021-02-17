@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Fixed
+
+- `Iter` now returns all child elements
+
+
 ## v0.15.2 — 2021-02-14
 
 ### Added

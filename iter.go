@@ -11,7 +11,8 @@ import (
 
 // Iter provides a mechanism for iterating over the children of an XML element.
 // Successive calls to the Next method will step through each child, returning
-// its start element and a reader that is limited to the remainder of the child.
+// its start element (if applicable) and a reader that is limited to the
+// remainder of the child.
 type Iter struct {
 	r       TokenReadCloser
 	err     error
@@ -75,12 +76,17 @@ func (i *Iter) Next() bool {
 		return false
 	}
 
-	if start, ok := t.(xml.StartElement); ok {
-		i.next = &start
+	switch tok := t.(type) {
+	case xml.StartElement:
+		i.next = &tok
 		i.cur = MultiReader(Inner(i.r), Token(i.next.End()))
 		return true
+	case xml.EndElement:
+		return false
 	}
-	return false
+	i.next = nil
+	i.cur = Token(t)
+	return true
 }
 
 // Current returns a reader over the most recent child.

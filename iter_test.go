@@ -28,6 +28,14 @@ var iterTests = [...]struct {
 			{fooStart, fooStart.End()},
 		},
 	},
+	2: {
+		in: `<nums><a/>CHAR<a/></nums>`,
+		out: [][]xml.Token{
+			{aStart, aStart.End()},
+			{xml.CharData("CHAR")},
+			{aStart, aStart.End()},
+		},
+	},
 }
 
 func TestIter(t *testing.T) {
