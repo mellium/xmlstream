@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - `Iter` now returns all child elements
+- `MultiReader` no longer panics on a nil reader
 
 
 ## v0.15.2 — 2021-02-14

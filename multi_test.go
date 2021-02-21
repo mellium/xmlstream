@@ -33,6 +33,21 @@ func callDepth(callers []uintptr) (depth int) {
 	return
 }
 
+func TestMultiReaderSkipsNil(t *testing.T) {
+	r := xmlstream.MultiReader(
+		nil,
+		xmlstream.Token(xml.CharData("foo")),
+	)
+	tok, err := r.Token()
+	if string(tok.(xml.CharData)) != "foo" || err != io.EOF {
+		t.Errorf(`got %s, %v; want xml.CharData("foo"), nil`, tok, err)
+	}
+	tok, err = r.Token()
+	if tok != nil || err != io.EOF {
+		t.Errorf(`got %s, %v; want nil, io.EOF`, tok, err)
+	}
+}
+
 // Test that MultiReader properly flattens chained multiReaders when Read is
 // called
 func TestMultiReaderFlatten(t *testing.T) {

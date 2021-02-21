@@ -34,6 +34,10 @@ func (mr *multiReader) Token() (t xml.Token, err error) {
 				continue
 			}
 		}
+		if mr.readers[0] == nil {
+			mr.readers = mr.readers[1:]
+			continue
+		}
 		t, err = mr.readers[0].Token()
 		if err == io.EOF || (t == nil && err == nil) {
 			// Use eofReader instead of nil to avoid nil panic
