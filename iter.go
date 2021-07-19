@@ -79,7 +79,8 @@ func (i *Iter) Next() bool {
 	switch tok := t.(type) {
 	case xml.StartElement:
 		i.next = &tok
-		i.cur = MultiReader(Inner(i.r), Token(i.next.End()))
+		//i.cur = MultiReader(Inner(i.r), Token(i.next.End()))
+		i.cur = InnerElement(i.r)
 		return true
 	case xml.EndElement:
 		return false
