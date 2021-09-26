@@ -2,7 +2,7 @@
 
 [![Issue Tracker][badge]](https://github.com/mellium/xmpp/issues)
 [![GoDoc](https://godoc.org/mellium.im/xmlstream?status.svg)](https://pkg.go.dev/mellium.im/xmlstream)
-[![Chat](https://inverse.chat/badge.svg?room=users@mellium.chat)](https://mellium.chat)
+[![Chat](https://img.shields.io/badge/XMPP-users@mellium.chat-orange.svg)](https://mellium.chat)
 [![License](https://img.shields.io/badge/license-FreeBSD-blue.svg)](https://opensource.org/licenses/BSD-2-Clause)
 [![Build Status](https://builds.sr.ht/~samwhited/xmlstream.svg)](https://builds.sr.ht/~samwhited/xmlstream?)
 
