@@ -226,6 +226,32 @@ func TestInnerElement(t *testing.T) {
 	}
 }
 
+func TestInnerElementEarlyEOF(t *testing.T) {
+	r := xmlstream.Wrap(nil, xml.StartElement{Name: xml.Name{Local: "foo"}})
+	tok, err := r.Token()
+	if err != nil {
+		t.Fatalf("error popping token: %v", err)
+	}
+	inner := xmlstream.InnerElement(r)
+	b := new(bytes.Buffer)
+	e := xml.NewEncoder(b)
+	err = e.EncodeToken(tok)
+	if err != nil {
+		t.Fatalf("error encoding start token: %v", err)
+	}
+	_, err = xmlstream.Copy(e, inner)
+	if err != nil {
+		t.Fatalf("error copying data: %v", err)
+	}
+	if err := e.Flush(); err != nil {
+		t.Fatalf("Error flushing: %q", err)
+	}
+	const expected = "<foo></foo>"
+	if out := b.String(); out != expected {
+		t.Fatalf("wrong output: want=%v, got=%v", expected, out)
+	}
+}
+
 func TestWrapMallocs(t *testing.T) {
 	s := xml.StartElement{
 		Name: xml.Name{Local: "test"},

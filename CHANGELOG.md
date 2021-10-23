@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Fixed
+
+- `InnerElement` now works correctly when `io.EOF` is returned at the same time
+  as the `EndElement` token.
+
+
 ## v0.15.3 — 2021-09-26
 
 ### Fixed

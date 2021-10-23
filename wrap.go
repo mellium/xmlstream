@@ -72,9 +72,6 @@ func innerElement(r xml.TokenReader, returnOuter bool) xml.TokenReader {
 		}
 
 		t, err := r.Token()
-		if err != nil {
-			return nil, err
-		}
 		switch t.(type) {
 		case xml.StartElement:
 			count++
