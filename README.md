@@ -35,5 +35,5 @@ conditions.
 [badge]: https://img.shields.io/badge/style-mellium%2fxmpp-green.svg?longCache=true&style=popout-square&label=issues
 [`io`]: https://golang.org/pkg/io/
 [CONTRIBUTING.md]: https://mellium.im/docs/CONTRIBUTING
-[LICENSE]: ./LICENSE
-[LICENSE-GO]: ./LICENSE-GO
+[LICENSE]: https://github.com/mellium/xmpp/blob/main/LICENSE
+[LICENSE-GO]: https://github.com/mellium/xmpp/blob/main/LICENSE-GO

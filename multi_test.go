@@ -55,7 +55,7 @@ func TestMultiReaderFlatten(t *testing.T) {
 	n := runtime.Callers(0, pc)
 	var myDepth = callDepth(pc[:n])
 	var readDepth int // will contain the depth from which fakeReader.Read was called
-	var r xml.TokenReader = xmlstream.MultiReader(xmlstream.ReaderFunc(func() (xml.Token, error) {
+	r := xmlstream.MultiReader(xmlstream.ReaderFunc(func() (xml.Token, error) {
 		n := runtime.Callers(1, pc)
 		readDepth = callDepth(pc[:n])
 		return nil, errors.New("irrelevant")

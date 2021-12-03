@@ -23,7 +23,7 @@ type copyTest struct {
 	panics bool
 }
 
-var testErr = fmt.Errorf("Test Err")
+var errTest = fmt.Errorf("test err")
 
 var copyTests = [...]copyTest{
 	0: {panics: true},
@@ -42,11 +42,11 @@ var copyTests = [...]copyTest{
 	},
 	3: {
 		r: xmlstream.ReaderFunc(func() (t xml.Token, err error) {
-			return xml.CharData("Test"), testErr
+			return xml.CharData("Test"), errTest
 		}),
 		n:   0,
 		out: ``,
-		err: testErr,
+		err: errTest,
 	},
 	4: {
 		// Make sure that we don't try to encode nil tokens or enter an infinite
@@ -92,7 +92,7 @@ func TestCopy(t *testing.T) {
 type errTokenWriter struct{}
 
 func (errTokenWriter) EncodeToken(t xml.Token) error {
-	return testErr
+	return errTest
 }
 
 func (errTokenWriter) Flush() error {
@@ -104,7 +104,7 @@ func TestCopyBadEncode(t *testing.T) {
 	if n != 0 {
 		t.Errorf("Expected no tokens to be copied, got %d", n)
 	}
-	if err != testErr {
+	if err != errTest {
 		t.Errorf("Expected testErr to be returned, got %v", err)
 	}
 }
