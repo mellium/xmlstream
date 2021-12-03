@@ -1,6 +1,6 @@
 // Copyright 2016 The Mellium Contributors.
-// Use of this source code is governed by the BSD 2-clause license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the BSD 2-clause
+// license that can be found in the LICENSE file.
 
 package xmlstream
 
@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	errNotEnd   = errors.New("Expected end element, found something else")
-	errNotStart = errors.New("Expected start element, found something else")
+	errNotEnd   = errors.New("expected end element, found something else")
+	errNotStart = errors.New("expected start element, found something else")
 )
 
 type unexpectedEndError struct {
