@@ -8,7 +8,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 	"testing"
 )
@@ -122,7 +121,7 @@ func TestInnerReader(t *testing.T) {
 			if ir == nil {
 				t.Fatal("InnerReader returned nil reader")
 			}
-			b, err := ioutil.ReadAll(ir)
+			b, err := io.ReadAll(ir)
 			if err != tc.Err {
 				t.Errorf("Unxpected error: want=`%v`, got=`%v`", tc.Err, err)
 			}
